@@ -15,18 +15,15 @@ patches = zeros(patchsize*patchsize, numpatches);
 %  For instance, IMAGES(21:30,21:30,1) is an image patch corresponding
 %  to the pixels in the block (21,21) to (30,30) of Image 1
 
+[ydim, xdim, num_images] = size(IMAGES);
 
-
-
-
-
-
-
-
-
-
-
-
+for i = 1:numpatches
+  img = randi(num_images);
+  y_start = randi(ydim - patchsize + 1);
+  x_start = randi(xdim - patchsize + 1);
+  patch = IMAGES(y_start:y_start+patchsize-1, x_start:x_start+patchsize-1, img);
+  patches(:,i) = patch(:);
+end
 
 %% ---------------------------------------------------------------
 % For the autoencoder to work well we need to normalize the data

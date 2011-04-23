@@ -13,3 +13,14 @@ helper code necessitated the use of Matlab.
 The L-BFGS code is licensed by Stanford under a Creative Commons,
 Attribute, Non-Commercial license. Please read the
 [[http://ufldl.stanford.edu/wiki/index.php/Exercise:Sparse_Autoencoder#Sparse_autoencoder_implementation][details on the UFLDL wiki]].
+
+* Questions
+** UFLDL
+"Since J(W,b) is a non-convex function, gradient descent is
+susceptible to local optima; however, in practice gradient descent
+usually works fairly well." - [[http://ufldl.stanford.edu/wiki/index.php/Backpropagation_Algorithm][UFLDL/Backpropagation]]
+
+Why? Is it *almost* convex? Are the local optima all of a similar
+quality? Are any of the variations (squared error / squared error +
+weight decay / squared error + weight decay + sparsity constraints)
+convex?

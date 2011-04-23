@@ -1,0 +1,11 @@
+* Overview
+My code for the Deep Learning class exercises. There should be nothing
+proprietary in here. For the earlier exercises, I tried to create
+parallel implementations in Octave and NumPy. Later on, class-supplied
+helper code necessitated the use of Matlab.
+
+* Materials
+- [[http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=DeepLearning][OpenClassroom Regression Tutorial]]
+- [[http://ufldl.stanford.edu/wiki/index.php/UFLDL_Tutorial][UFLDF Tutorial Wiki]]
+
+

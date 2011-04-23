@@ -8,4 +8,8 @@ helper code necessitated the use of Matlab.
 - [[http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=DeepLearning][OpenClassroom Regression Tutorial]]
 - [[http://ufldl.stanford.edu/wiki/index.php/UFLDL_Tutorial][UFLDF Tutorial Wiki]]
 
+* Note
 
+The L-BFGS code is licensed by Stanford under a Creative Commons,
+Attribute, Non-Commercial license. Please read the
+[[[[http://ufldl.stanford.edu/wiki/index.php/Exercise:Sparse_Autoencoder#Sparse_autoencoder_implementation]]][details on the UFLDL wiki]].

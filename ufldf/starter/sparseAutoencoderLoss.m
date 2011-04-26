@@ -15,7 +15,7 @@ W1grad = zeros(size(W1));
 W2grad = zeros(size(W2));
 b1grad = zeros(size(b1));
 b2grad = zeros(size(b2));
-m = size(data)(2);
+m = size(data, 2);
 
 %% ---------- YOUR CODE HERE --------------------------------------
 %  Instructions: Compute the loss for the Sparse Autoencoder and gradients
@@ -40,7 +40,8 @@ rho = targetActivation;
 KLsum = sum(rho * log(rho ./ rhohats) + (1-rho) * log((1-rho) ./ (1-rhohats)));
 
 
-squared_err_J = (1/2) * (1/m) * sum(((a3 - data).^2)(:));
+squares = (a3 - data).^2;
+squared_err_J = (1/2) * (1/m) * sum(squares(:))
 weight_decay_J = (lambda/2) * (sum(W1(:).^2) + sum(W2(:).^2));
 sparsity_J = beta * KLsum;
 
@@ -49,9 +50,7 @@ loss = squared_err_J + weight_decay_J + sparsity_J;
 % delta3 = -(data - a3) .* fprime(z3);
 % but fprime(z3) = a3 * (1-a3)
 delta3 = -(data - a3) .* a3 .* (1-a3);
-
 beta_term = beta * (- rho ./ rhohats + (1-rho) ./ (1-rhohats));
-
 delta2 = ((W2' * delta3) + repmat(beta_term, [1,m]) ) .* a2 .* (1-a2);
 
 W2grad = (1/m) * delta3 * a2' + lambda * W2;

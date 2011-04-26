@@ -41,7 +41,7 @@ KLsum = sum(rho * log(rho ./ rhohats) + (1-rho) * log((1-rho) ./ (1-rhohats)));
 
 
 squares = (a3 - data).^2;
-squared_err_J = (1/2) * (1/m) * sum(squares(:))
+squared_err_J = (1/2) * (1/m) * sum(squares(:));
 weight_decay_J = (lambda/2) * (sum(W1(:).^2) + sum(W2(:).^2));
 sparsity_J = beta * KLsum;
 

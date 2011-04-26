@@ -2,20 +2,21 @@
 
 %  Instructions
 %  ------------
-% 
+%
 %  This starter file contains code that helps you get started on the
 %  homework. You are required to complete the code in sampleIMAGES.m,
 %  sparseAutoencoderLoss.m and computeNumericalGradient.m
 %  For the purpose of completing the assignment, you do not need to
-%  change the code in this file. 
+%  change the code in this file.
 %
 %%======================================================================
 %% STEP 0: We are giving you all relevent parameters to get good filters,
 % So you do not need to change the parameters below
 visibleSize = 8*8;
 hiddenSize = 25;
+% hiddenSize = 3;  % (For testing)
 targetActivation = 0.01;   % Try between 0.01 to 0.05
-lambda = 0.0001;           % Try small values about 0.0001 
+lambda = 0.0001;           % Try small values about 0.0001
 beta = 3;                  % Try between 1 to 10
 
 %%======================================================================
@@ -25,6 +26,7 @@ beta = 3;                  % Try between 1 to 10
 %  display a random sample of 200 patches from the dataset
 
 patches = sampleIMAGES;
+% patches = patches(:,1:10);  % (For testing)
 display_network(patches(:,randi(size(patches,2),200,1)),8);
 
 
@@ -47,7 +49,7 @@ theta = initializeParameters(hiddenSize, visibleSize);
 %  (c) Implement Sparsity Cost then Gradient Checking
 %
 %  Hint: You are free to change the training settings when debugging your
-%  code. However, in your final submission of visualized weights, use the 
+%  code. However, in your final submission of visualized weights, use the
 %  following settings for the parameters.
 
 [loss, grad] = sparseAutoencoderLoss(theta, visibleSize, hiddenSize, lambda, ...
@@ -55,7 +57,7 @@ theta = initializeParameters(hiddenSize, visibleSize);
 
 %%======================================================================
 %% STEP 3: Gradient Checking
-%  Hint: Perform gradient checks on small models and datasets 
+%  Hint: Perform gradient checks on small models and datasets
 %        (e.g. use only first 10 patches and 1 hidden unit)
 numgrad = computeNumericalGradient( @(x) sparseAutoencoderLoss(x, visibleSize, ...
                                                   hiddenSize, lambda, ...
@@ -63,7 +65,7 @@ numgrad = computeNumericalGradient( @(x) sparseAutoencoderLoss(x, visibleSize, .
                                                   patches), theta);
 
 % Use this to eyeball the gradients
-disp([numgrad grad]); 
+disp([numgrad grad]);
 
 % Compare numerical gradients and analytical
 diff = norm(numgrad-grad)/norm(numgrad+grad);
@@ -90,8 +92,8 @@ options.display = 'on';
                               theta, options);
 
 %%======================================================================
-%% STEP 5: Visualization 
+%% STEP 5: Visualization
 W1 = reshape(opttheta(1:hiddenSize*visibleSize), hiddenSize, visibleSize);
-display_network(W1', 12); 
+display_network(W1', 12);
 
 

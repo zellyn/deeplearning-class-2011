@@ -1,4 +1,4 @@
-#! /Users/zellyn/.ve/np/bin/python
+#! ~/.ve/np/bin/python
 
 import time
 import sys

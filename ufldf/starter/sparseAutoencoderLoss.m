@@ -10,11 +10,6 @@ b1 = theta(2*hiddenSize*visibleSize+1:2*hiddenSize*visibleSize+hiddenSize);
 b2 = theta(2*hiddenSize*visibleSize+hiddenSize+1:end);
 
 % Loss and gradient variables (your code needs to compute these values)
-loss = 0;
-W1grad = zeros(size(W1));
-W2grad = zeros(size(W2));
-b1grad = zeros(size(b1));
-b2grad = zeros(size(b2));
 m = size(data, 2);
 
 %% ---------- YOUR CODE HERE --------------------------------------
@@ -57,15 +52,6 @@ W2grad = (1/m) * delta3 * a2' + lambda * W2;
 b2grad = (1/m) * sum(delta3, 2);
 W1grad = (1/m) * delta2 * data' + lambda * W1;
 b1grad = (1/m) * sum(delta2, 2);
-
-
-
-
-
-
-
-
-
 
 %-------------------------------------------------------------------
 % Convert weights and bias gradients to a compressed form

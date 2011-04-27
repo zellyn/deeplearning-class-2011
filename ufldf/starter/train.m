@@ -55,21 +55,21 @@ theta = initializeParameters(hiddenSize, visibleSize);
 [loss, grad] = sparseAutoencoderLoss(theta, visibleSize, hiddenSize, lambda, ...
                                      targetActivation, beta, patches);
 
-%%======================================================================
-%% STEP 3: Gradient Checking
-%  Hint: Perform gradient checks on small models and datasets
-%        (e.g. use only first 10 patches and 1 hidden unit)
-numgrad = computeNumericalGradient( @(x) sparseAutoencoderLoss(x, visibleSize, ...
-                                                  hiddenSize, lambda, ...
-                                                  targetActivation, beta, ...
-                                                  patches), theta);
-
-% Use this to eyeball the gradients
-disp([numgrad grad]);
-
-% Compare numerical gradients and analytical
-diff = norm(numgrad-grad)/norm(numgrad+grad);
-disp(diff); % should be small e.g. < 1e-6
+% %%======================================================================
+% %% STEP 3: Gradient Checking
+% %  Hint: Perform gradient checks on small models and datasets
+% %        (e.g. use only first 10 patches and 1 hidden unit)
+% numgrad = computeNumericalGradient( @(x) sparseAutoencoderLoss(x, visibleSize, ...
+%                                                   hiddenSize, lambda, ...
+%                                                   targetActivation, beta, ...
+%                                                   patches), theta);
+%
+% % Use this to eyeball the gradients
+% disp([numgrad grad]);
+%
+% % Compare numerical gradients and analytical
+% diff = norm(numgrad-grad)/norm(numgrad+grad);
+% disp(diff); % should be small e.g. < 1e-6
 
 %%======================================================================
 %% STEP 4: Run your sparseAutoencoderLoss function with minFunc and
@@ -90,6 +90,7 @@ options.display = 'on';
                                    lambda, targetActivation, ...
                                    beta, patches), ...
                               theta, options);
+
 
 %%======================================================================
 %% STEP 5: Visualization

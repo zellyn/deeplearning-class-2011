@@ -13,6 +13,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import scipy.io as sio
 import scipy.optimize
 
+def normalize_data(data):
+  data = data - np.mean(data)
+  pstd = 3 * np.std(data)
+  data = np.fmax(np.fmin(data, pstd), -pstd) / pstd
+  data = (data + 1) * 0.4 + 0.1;
+  return data
+
 def sampleIMAGES(patchsize, num_patches):
   IMAGES = sio.loadmat('IMAGES')['IMAGES']
   patches = np.zeros([patchsize * patchsize, num_patches])
@@ -25,21 +32,48 @@ def sampleIMAGES(patchsize, num_patches):
     patch = IMAGES[y_start:y_start+patchsize, x_start:x_start+patchsize, img]
     patches[:,i] = patch.reshape([patchsize * patchsize])
 
-  return patches
+  return normalize_data(patches)
 
 def display_network(arr):
-  # TODO(zellyn): implement
-  print "display_network: arr.shape=%s" % (arr.shape,)
+  arr = arr - np.mean(arr)
+  L, M = arr.shape
+  sz = np.sqrt(L)
+  buf = 1
+
+  # Figure out pleasant grid dimensions
+  if M == np.floor(np.sqrt(M))**2:
+    n = m = np.sqrt(M)
+  else:
+    n = np.ceil(np.sqrt(M))
+    while (M%n) and n < 1.2*np.sqrt(M):
+      n += 1
+    m = np.ceil(M/n)
+
+  array = np.zeros([buf+m*(sz+buf), buf+n*(sz+buf)])
+
+  k = 0
+  for i in range(0, int(m)):
+    for j in range(0, int(n)):
+      if k>=M:
+        continue
+      cmax = np.max(arr[:,k])
+      cmin = np.min(arr[:,k])
+      r = buf+i*(sz+buf)
+      c = buf+j*(sz+buf)
+      array[r:r+sz, c:c+sz] = (arr[:,k].reshape([sz,sz]) - cmin) / (cmax-cmin)
+      k = k + 1
+  plt.imshow(array, interpolation='nearest', cmap=plt.cm.gray)
+  plt.show()
 
 def flatten(W1, W2, b1, b2):
-  return np.array(np.hstack([W1.ravel(), W2.ravel(), b1.ravel(), b2.ravel()]), order='F')
+  return np.array(np.hstack([W1.ravel('F'), W2.ravel('F'), b1.ravel('F'), b2.ravel('F')]), order='F')
 
 def unflatten(theta, visible_size, hidden_size):
   hv = hidden_size * visible_size
-  W1 = theta[0:hv].reshape([hidden_size, visible_size])
-  W2 = theta[hv:2*hv].reshape([visible_size, hidden_size])
-  b1 = theta[2*hv:2*hv+hidden_size].reshape([hidden_size, 1])
-  b2 = theta[2*hv+hidden_size:].reshape([visible_size, 1])
+  W1 = theta[0:hv].reshape([hidden_size, visible_size], order='F')
+  W2 = theta[hv:2*hv].reshape([visible_size, hidden_size], order='F')
+  b1 = theta[2*hv:2*hv+hidden_size].reshape([hidden_size, 1], order='F')
+  b2 = theta[2*hv+hidden_size:].reshape([visible_size, 1], order='F')
   return (W1, W2, b1, b2)
 
 def initialize_parameters(hidden_size, visible_size):
@@ -127,14 +161,15 @@ def main(testing=False):
   loss, grad = sal(theta)
 
 
-  # # STEP 3: Gradient Checking
-  # numgrad = compute_numerical_gradient(lambda x: sal(x)[0], theta)
-  #
-  # # Eyeball the gradients
-  # print np.hstack([numgrad, grad])
-  #
-  # diff = linalg.norm(numgrad-grad) / linalg.norm(numgrad+grad)
-  # print "Normed difference: %f" % diff
+  # STEP 3: Gradient Checking
+  if testing:
+    numgrad = compute_numerical_gradient(lambda x: sal(x)[0], theta)
+
+    # Eyeball the gradients
+    print np.hstack([numgrad, grad])
+
+    diff = linalg.norm(numgrad-grad) / linalg.norm(numgrad+grad)
+    print "Normed difference: %f" % diff
 
   # STEP 4: Run sparse_autoencoder_loss with L-BFGS
 
@@ -142,11 +177,54 @@ def main(testing=False):
   theta = initialize_parameters(hidden_size, visible_size)
 
   print "Starting..."
-  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=1)
+  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=3000, iprint=25, m=grad.size)
   print "Done"
   print x
   print f
   print d
 
+  W1, W2, b1, b2 = unflatten(x, visible_size, hidden_size)
+  print "W1.shape=%s" % (W1.shape,)
+  display_network(W1.T)
+
+def test_loss():
+  visible_size = 4
+  hidden_size = 2
+  rho = 0.01
+  lamb = 0.0001
+  beta = 3
+
+  W1 = np.array([
+      [9, 3, 6, -1],
+      [7, 5, 3, 2]])
+
+  W2 = np.array([
+      [0.2, -0.9],
+      [-0.3, 1.1],
+      [0.5, 0.6],
+      [0.7, -0.4]])
+
+  b1 = np.array([
+      [-0.7],
+      [-0.5]])
+
+  b2 = np.array([
+      [0.2],
+      [1.3],
+      [-0.7],
+      [0.6]])
+
+  theta = flatten(W1,W2,b1,b2)
+
+  data = np.array([
+      [0.2, -0.7,  0.8, -0.1, -0.8],
+      [0.3,  0.4, -0.7,  0.2, -0.9],
+      [0.1, -0.3, -0.6,  1.0,  0.7],
+      [0.8,  0.5, -0.7, -0.9, -0.7],
+  ])
+
+  print sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb, rho, beta, data)
+
 if __name__ == '__main__':
+  # test_loss()
   main(testing=False)

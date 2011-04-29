@@ -10,10 +10,10 @@ helper code necessitated the use of Matlab (for now).
 
 * Note
 
-The L-BFGS Matlab code is licensed by Stanford under a Creative Commons,
-Attribute, Non-Commercial license. Please read the
-[[http://ufldl.stanford.edu/wiki/index.php/Exercise:Sparse_Autoencoder#Sparse_autoencoder_implementation][details on the UFLDL wiki]].
-
+- The L-BFGS Matlab code is licensed by Stanford under a Creative Commons,
+  Attribute, Non-Commercial license. Please read the
+  [[http://ufldl.stanford.edu/wiki/index.php/Exercise:Sparse_Autoencoder#Sparse_autoencoder_implementation][details on the UFLDL wiki]].
+- The MNIST digit data comes from [[http://yann.lecun.com/exdb/mnist/]].
 * Questions
 ** UFLDL
 "Since J(W,b) is a non-convex function, gradient descent is

@@ -21,7 +21,7 @@ def normalize_data(data):
   return data
 
 def sampleIMAGES(patchsize, num_patches):
-  IMAGES = sio.loadmat('IMAGES')['IMAGES']
+  IMAGES = sio.loadmat('data/IMAGES')['IMAGES']
   patches = np.zeros([patchsize * patchsize, num_patches])
   [ydim, xdim, num_images] = IMAGES.shape
 

@@ -60,7 +60,7 @@ def display_network(arr):
       cmin = np.min(arr[:,k])
       r = buf+i*(sz+buf)
       c = buf+j*(sz+buf)
-      array[r:r+sz, c:c+sz] = (arr[:,k].reshape([sz,sz]) - cmin) / (cmax-cmin)
+      array[r:r+sz, c:c+sz] = (arr[:,k].reshape([sz,sz], order='F') - cmin) / (cmax-cmin)
       k = k + 1
   plt.imshow(array, interpolation='nearest', cmap=plt.cm.gray)
   plt.show()
@@ -177,7 +177,7 @@ def main(testing=False):
   theta = initialize_parameters(hidden_size, visible_size)
 
   print "Starting..."
-  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=3000, iprint=25, m=grad.size)
+  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=25, m=20)
   print "Done"
   print x
   print f

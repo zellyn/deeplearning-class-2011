@@ -44,7 +44,7 @@ def main(testing=True):
   def sal(theta):
     return sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
                                    sparsity_param, beta, patches)
-  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=25, m=20)
+  x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=1, m=20)
   W1, W2, b1, b2 = unflatten(x, visible_size, hidden_size)
   display_network(W1.T)
 

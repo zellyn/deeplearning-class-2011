@@ -1,5 +1,7 @@
 %% CS294a Introductory Homework Starter Code
 
+addpath '../library/'
+
 %  Instructions
 %  ------------
 %

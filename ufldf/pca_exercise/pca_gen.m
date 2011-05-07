@@ -1,3 +1,5 @@
+addpath '../library/'
+
 %%================================================================
 %% Step 0a: Load data
 %  Here we provide the code to load natural image data into x.

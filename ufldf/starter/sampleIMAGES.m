@@ -2,7 +2,7 @@ function patches = sampleIMAGES
 % sampleIMAGES
 % Returns 10000 patches for training
 
-load 'data/IMAGES';
+load '../data/IMAGES';
 
 patchsize = 8;
 numpatches = 10000;

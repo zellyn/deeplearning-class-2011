@@ -9,7 +9,7 @@ load 'testdata/save_theta.mat';
 
 % [loss, grad] = sparseAutoencoderLoss(theta, visibleSize, hiddenSize, lambda, target_activation, beta, data);
 
-addpath minFunc/
+addpath '../library/minFunc/'
 options.Method = 'lbfgs';
 options.maxIter = 400;
 options.display = 'on';

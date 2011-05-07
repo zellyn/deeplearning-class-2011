@@ -13,7 +13,7 @@ lambda = 3e-3;
 beta = 3;
 patches = images(:,1:10000);
 theta = initializeParameters(hiddenSize, visibleSize);
-addpath minFunc/
+addpath '../library/minFunc/'
 options.Method = 'lbfgs';
 options.maxIter = 400;
 options.display = 'on';

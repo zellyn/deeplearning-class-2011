@@ -79,7 +79,7 @@ theta = initializeParameters(hiddenSize, visibleSize);
 theta = initializeParameters(hiddenSize, visibleSize);
 
 %  Use minFunc to minimize the function
-addpath minFunc/
+addpath '../library/minFunc/'
 options.Method = 'lbfgs';
 options.maxIter = 400;
 options.display = 'on';

@@ -30,8 +30,8 @@ def load_MNIST_labels(filename):
   return labels
 
 def main(testing=True):
-  images = load_MNIST_images('data/train-images-idx3-ubyte')  # 784 x 60000
-  labels = load_MNIST_labels('data/train-labels-idx1-ubyte')  # 60000 x 1
+  images = load_MNIST_images('../data/train-images-idx3-ubyte')  # 784 x 60000
+  labels = load_MNIST_labels('../data/train-labels-idx1-ubyte')  # 60000 x 1
   display_network(images[:,0:100])  # Show the first 100 images
 
   visible_size = 28*28

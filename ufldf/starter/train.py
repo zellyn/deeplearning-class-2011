@@ -2,16 +2,9 @@
 
 import time
 import sys
-import numpy as np
-import scipy as sp
-import matplotlib as mpl
-if sys.platform == 'darwin': mpl.use('TkAgg')
 
-import matplotlib.pyplot as plt
-from scipy import linalg
-from mpl_toolkits.mplot3d import Axes3D
-import scipy.io as sio
-import scipy.optimize
+sys.path.append('..')
+from library.imports import *
 
 def normalize_data(data):
   data = data - np.mean(data)
@@ -21,7 +14,7 @@ def normalize_data(data):
   return data
 
 def sampleIMAGES(patchsize, num_patches):
-  IMAGES = sio.loadmat('data/IMAGES')['IMAGES']
+  IMAGES = sio.loadmat('../data/IMAGES')['IMAGES']
   patches = np.zeros([patchsize * patchsize, num_patches])
   [ydim, xdim, num_images] = IMAGES.shape
 

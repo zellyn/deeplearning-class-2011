@@ -14,6 +14,8 @@ function [h, array] = display_network(A, opt_normalize, opt_graycolor, cols, opt
 oldwarning = warning;
 warning off all
 
+figure();
+
 if ~exist('opt_normalize', 'var') || isempty(opt_normalize)
     opt_normalize= true;
 end
@@ -98,7 +100,6 @@ else
     h=imagesc(array, [-1 1]);
 end
 axis image off
-
 drawnow;
 
 % warning on all

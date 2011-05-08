@@ -31,7 +31,6 @@ patches = sampleIMAGES;
 % patches = patches(:,1:10);  % (For testing)
 display_network(patches(:,randi(size(patches,2),200,1)),8);
 
-
 %  Obtain random theta
 theta = initializeParameters(hiddenSize, visibleSize);
 
@@ -98,5 +97,3 @@ options.display = 'on';
 %% STEP 5: Visualization
 W1 = reshape(opttheta(1:hiddenSize*visibleSize), hiddenSize, visibleSize);
 display_network(W1', 12);
-
-

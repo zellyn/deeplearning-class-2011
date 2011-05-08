@@ -1,6 +1,7 @@
 function [cost, grad] = softmaxCost(theta, numClasses, inputSize, lambda, data, labels)
 
-% numClasses - the number of classes 
+% theta - numClasses*k
+% numClasses - the number of classes
 % inputSize - the size k of the input vector
 % lambda - weight decay parameter
 % data - the kxm input matrix, where each column data(:, i) corresponds to
@@ -21,6 +22,16 @@ thetagrad = zeros(numClasses, inputSize);
 %  Instructions: Compute the cost and gradient for softmax regression.
 %                You need to compute thetagrad and cost.
 %                The groundTruth matrix might come in handy.
+
+% Compute theta^T x
+theta_x = theta * data;
+% Subtract out the max by column so we don't overflow (this'll affect numerator
+% and denominator equally)
+theta_x = bsxfun(@minus, theta_x, max(theta_x, [], 1));
+% e^(theta^T x)
+e_theta_x = e .^ theta_x;
+% Normalize
+h_x = bsxfun(@rdivide, e_theta_x, sum(e_theta_x));
 
 
 %% Unroll the gradient matrices into a vector for minFunc

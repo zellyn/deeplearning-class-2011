@@ -58,8 +58,7 @@ if DEBUG
 end
 
 % Randomly initialise theta
-theta = sqrt(6) / sqrt(numClasses * inputSize) ...
-        * randn(numClasses * inputSize, 1);
+theta = 0.005 * randn(numClasses * inputSize, 1);
 
 %%======================================================================
 %% STEP 2: Implement softmaxCost
@@ -117,7 +116,6 @@ labels = loadMNISTLabels('mnist/t10k-labels-idx1-ubyte');
 labels(labels==0) = 10; % Remap 0 to 10
 
 inputData = images;
-labels = labels;
 
 % You will have to implement softmaxPredict in softmaxPredict.m
 [pred] = softmaxPredict(softmaxModel, inputData);

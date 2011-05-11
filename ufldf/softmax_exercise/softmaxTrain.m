@@ -4,12 +4,12 @@ function [softmaxModel] = softmaxTrain(inputSize, numClasses, lambda, inputData,
 % for the model.
 %
 % inputSize: the size of an input vector x^(i)
-% numClasses: the number of classes 
+% numClasses: the number of classes
 % lambda: weight decay parameter
-% inputData: an r by c matrix containing the input data, such that
+% inputData: an N by M matrix containing the input data, such that
 %            inputData(:, c) is the cth input
-% labels: c by 1 matrix containing the class labels for the
-%            corresponding inputs. labels(c, 1) is the class label for
+% labels: M by 1 matrix containing the class labels for the
+%            corresponding inputs. labels(c) is the class label for
 %            the cth input
 % options (optional): options
 %   options.maxIter: number of iterations to train for
@@ -23,7 +23,7 @@ if ~isfield(options, 'maxIter')
 end
 
 % initialize parameters
-theta = 1 / sqrt(numClasses * inputSize) * randn(numClasses * inputSize, 1);
+theta = 0.005 * randn(numClasses * inputSize, 1);
 
 % Use minFunc to minimize the function
 addpath minFunc/
@@ -36,12 +36,12 @@ minFuncOptions.display = 'on';
 
 [softmaxOptTheta, cost] = minFunc( @(p) softmaxCost(p, ...
                                    numClasses, inputSize, lambda, ...
-                                   inputData, labels), ...                                   
+                                   inputData, labels), ...
                               theta, options);
 
 % Fold softmaxOptTheta into a nicer format
 softmaxModel.optTheta = reshape(softmaxOptTheta, numClasses, inputSize);
 softmaxModel.inputSize = inputSize;
 softmaxModel.numClasses = numClasses;
-                          
-end                          
+
+end

@@ -39,7 +39,7 @@ images = loadMNISTImages('../data/train-images-idx3-ubyte');
 labels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
 labels(labels==0) = 10; % Remap 0 to 10
 
-inputData = images;
+inputData = [ones(1, size(images,2)); images];
 
 % For debugging purposes, you may wish to reduce the size of the input data
 % in order to speed up gradient checking.
@@ -115,7 +115,7 @@ images = loadMNISTImages('../data/t10k-images-idx3-ubyte');
 labels = loadMNISTLabels('../data/t10k-labels-idx1-ubyte');
 labels(labels==0) = 10; % Remap 0 to 10
 
-inputData = images;
+inputData = [ones(1, size(images,2)); images];
 
 % You will have to implement softmaxPredict in softmaxPredict.m
 [pred] = softmaxPredict(softmaxModel, inputData);

@@ -15,12 +15,14 @@ pred = zeros(1, size(data, 2));
 %  Instructions: Compute pred using theta assuming that the labels start
 %                from 1.
 
+inputSize = softmaxModel.inputSize
+numClasses = softmaxModel.numClasses
+theta_x = theta * data;
+theta_x = bsxfun(@minus, theta_x, max(theta_x, [], 1));
+e_theta_x = e .^ theta_x;
+h_x = bsxfun(@rdivide, e_theta_x, sum(e_theta_x));
 
-
-
-
-
-
+[_, pred] = max(h_x);
 
 % ---------------------------------------------------------------------
 

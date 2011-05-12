@@ -67,26 +67,26 @@ theta = 0.005 * randn(numClasses * inputSize, 1);
 
 [cost, grad] = softmaxCost(theta, numClasses, inputSize, lambda, inputData, labels);
 
-%%======================================================================
-%% STEP 3: Gradient checking
+% %%======================================================================
+% %% STEP 3: Gradient checking
+% %
+% %  As with any learning algorithm, you should always check that your
+% %  gradients are correct before learning the parameters.
+% %
 %
-%  As with any learning algorithm, you should always check that your
-%  gradients are correct before learning the parameters.
+% numGrad = computeNumericalGradient( @(x) softmaxCost(x, numClasses, ...
+%                                     inputSize, lambda, inputData, labels), theta);
 %
-
-numGrad = computeNumericalGradient( @(x) softmaxCost(x, numClasses, ...
-                                    inputSize, lambda, inputData, labels), theta);
-
-% Use this to visually compare the gradients side by side
-disp([numGrad grad]);
-
-% Compare numerically computed gradients with those computed analytically
-diff = norm(numGrad-grad)/norm(numGrad+grad);
-disp(diff);
-% The difference should be small.
-% In our implementation, these values are usually less than 1e-7.
-
-% When your gradients are correct, congratulations!
+% % Use this to visually compare the gradients side by side
+% disp([numGrad grad]);
+%
+% % Compare numerically computed gradients with those computed analytically
+% diff = norm(numGrad-grad)/norm(numGrad+grad);
+% disp(diff);
+% % The difference should be small.
+% % In our implementation, these values are usually less than 1e-7.
+%
+% % When your gradients are correct, congratulations!
 
 %%======================================================================
 %% STEP 4: Learning parameters

@@ -26,7 +26,7 @@ end
 theta = 0.005 * randn(numClasses * inputSize, 1);
 
 % Use minFunc to minimize the function
-addpath minFunc/
+addpath '../library/minFunc/'
 options.Method = 'lbfgs'; % Here, we use L-BFGS to optimize our cost
                           % function. Generally, for minFunc to work, you
                           % need a function pointer with two outputs: the

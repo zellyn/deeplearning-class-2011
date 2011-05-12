@@ -19,7 +19,7 @@ addpath '../library/'
 %  to be used more generally on any arbitrary input.
 %  We also initialise some parameters used for tuning the model.
 
-inputSize = 28 * 28; % Size of input vector (MNIST images are 28x28)
+inputSize = 28 * 28 + 1; % Size of input vector (MNIST images are 28x28)
 numClasses = 10;     % Number of classes (MNIST images fall into 10 classes)
 
 lambda = 1e-3; % Weight decay parameter

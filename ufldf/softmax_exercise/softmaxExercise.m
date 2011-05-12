@@ -50,7 +50,7 @@ if DEBUG
     inputSize = 8;
     % only 100 datapoints
     inputData = inputData(:, 1:100);
-    [_, i] = sort(var(inputData, 0, 2), "descend");
+    [nop, i] = sort(var(inputData, 0, 2), 'descend');
     indices = i(1:inputSize);
     % only top inputSize most-varying input elements (pixels)
     inputData = inputData(indices, :);

@@ -19,7 +19,7 @@ inputSize = softmaxModel.inputSize
 numClasses = softmaxModel.numClasses
 theta_x = theta * data;
 theta_x = bsxfun(@minus, theta_x, max(theta_x, [], 1));
-e_theta_x = e .^ theta_x;
+e_theta_x = exp(theta_x);
 h_x = bsxfun(@rdivide, e_theta_x, sum(e_theta_x));
 
 [_, pred] = max(h_x);

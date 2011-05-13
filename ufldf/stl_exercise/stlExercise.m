@@ -1,16 +1,18 @@
 %% CS294A/CS294W Self-taught Learning Exercise
 
+addpath '../library/'
+
 %  Instructions
 %  ------------
-% 
+%
 %  This file contains code that helps you get started on the
 %  self-taught learning. You will need to complete code in filterInput.m.
-%  You will also need to have implemented sparseAutoencoderCost.m and 
+%  You will also need to have implemented sparseAutoencoderCost.m and
 %  softmaxCost.m from previous exercises.
 %
 %% ======================================================================
 %  STEP 0: Here we provide the relevant parameters values that will
-%  allow your sparse autoencoder to get good filters; you do not need to 
+%  allow your sparse autoencoder to get good filters; you do not need to
 %  change the parameters below.
 
 inputSize  = 28 * 28;
@@ -18,9 +20,9 @@ numLabels  = 5;
 hiddenSize = 200;
 sparsityParam = 0.1; % desired average activation of the hidden units.
                      % (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
-		             %  in the lecture notes). 
-lambda = 3e-3;       % weight decay parameter       
-beta = 3;            % weight of sparsity penalty term   
+		             %  in the lecture notes).
+lambda = 3e-3;       % weight decay parameter
+beta = 3;            % weight of sparsity penalty term
 maxIter = 400;
 
 %% ======================================================================
@@ -31,8 +33,8 @@ maxIter = 400;
 %  change it.
 
 % Load MNIST database files
-mnistData   = loadMNISTImages('mnist/train-images-idx3-ubyte');
-mnistLabels = loadMNISTLabels('mnist/train-labels-idx1-ubyte');
+mnistData   = loadMNISTImages('../data/train-images-idx3-ubyte');
+mnistLabels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
 
 % Set Unlabeled Set (All Images)
 
@@ -60,7 +62,7 @@ fprintf('# examples in supervised testing set: %d\n\n', size(testData, 2));
 %% ======================================================================
 %  STEP 2: Train the sparse autoencoder
 %  This trains the sparse autoencoder on the unlabeled training
-%  images. 
+%  images.
 
 %  Randomly initialize the parameters
 theta = initializeParameters(hiddenSize, inputSize);
@@ -69,26 +71,26 @@ theta = initializeParameters(hiddenSize, inputSize);
 %  Find opttheta by running the sparse autoencoder on
 %  unlabeledTrainingImages
 
-opttheta = theta; 
-
-
-
-
-
-
-
-
+addpath '../library/minFunc/'
+options.Method = 'lbfgs';
+options.maxIter = 400;
+options.display = 'on';
+[opttheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
+    inputSize, hiddenSize, ...
+    lambda, sparsityParam, ...
+    beta, unlabeledData), ...
+    theta, options);
 
 %% -----------------------------------------------------
-                          
+
 % Visualize weights
 W1 = reshape(opttheta(1:hiddenSize * inputSize), hiddenSize, inputSize);
 display_network(W1');
 
 %%======================================================================
 %% STEP 3: Extract Features from the Supervised Dataset
-%  
-%  You need to complete the code in feedForwardAutoencoder.m so that the 
+%
+%  You need to complete the code in feedForwardAutoencoder.m so that the
 %  following command will extract features from the data.
 
 trainFeatures = feedForwardAutoencoder(opttheta, hiddenSize, inputSize, ...
@@ -100,10 +102,10 @@ testFeatures = feedForwardAutoencoder(opttheta, hiddenSize, inputSize, ...
 %%======================================================================
 %% STEP 4: Train the softmax classifier
 
-softmaxModel = struct;  
+softmaxModel = struct;
 %% ----------------- YOUR CODE HERE ----------------------
 %  Use softmaxTrain.m from the previous exercise to train a multi-class
-%  classifier. 
+%  classifier.
 
 %  Use lambda = 1e-4 for the weight regularization for softmax
 
@@ -123,7 +125,7 @@ softmaxModel = struct;
 
 
 %%======================================================================
-%% STEP 5: Testing 
+%% STEP 5: Testing
 
 %% ----------------- YOUR CODE HERE ----------------------
 % Compute Predictions on the test set (testFeatures) using softmaxPredict
@@ -156,4 +158,4 @@ fprintf('Test Accuracy: %f%%\n', 100*mean(pred(:) == testLabels(:)));
 %
 % Accuracy: 98.3%
 %
-% 
+%

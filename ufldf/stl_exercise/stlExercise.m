@@ -2,6 +2,10 @@
 
 addpath '../library/'
 
+METHOD = 'NORMAL';  % Run through, performing all computations
+% METHOD = 'SAVE';  % Run through, performing all computations, but save trained autoencoder
+% METHOD = 'LOAD';  % Skip autoencoder training: load it instead
+
 %  Instructions
 %  ------------
 %
@@ -25,63 +29,75 @@ lambda = 3e-3;       % weight decay parameter
 beta = 3;            % weight of sparsity penalty term
 maxIter = 400;
 
-%% ======================================================================
-%  STEP 1: Load data from the MNIST database
-%
-%  This loads our training and test data from the MNIST database files.
-%  We have sorted the data for you in this so that you will not have to
-%  change it.
+if strcmp(METHOD, 'NORMAL') || strcmp(METHOD, 'SAVE')
 
-% Load MNIST database files
-mnistData   = loadMNISTImages('../data/train-images-idx3-ubyte');
-mnistLabels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
+  %% ======================================================================
+  %  STEP 1: Load data from the MNIST database
+  %
+  %  This loads our training and test data from the MNIST database files.
+  %  We have sorted the data for you in this so that you will not have to
+  %  change it.
 
-% Set Unlabeled Set (All Images)
+  % Load MNIST database files
+  mnistData   = loadMNISTImages('../data/train-images-idx3-ubyte');
+  mnistLabels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
 
-% Simulate a Labeled and Unlabeled set
-labeledSet   = find(mnistLabels >= 0 & mnistLabels <= 4);
-unlabeledSet = find(mnistLabels >= 5);
+  % Set Unlabeled Set (All Images)
 
-numTrain = round(numel(labeledSet)/2);
-trainSet = labeledSet(1:numTrain);
-testSet  = labeledSet(numTrain+1:end);
+  % Simulate a Labeled and Unlabeled set
+  labeledSet   = find(mnistLabels >= 0 & mnistLabels <= 4);
+  unlabeledSet = find(mnistLabels >= 5);
 
-unlabeledData = mnistData(:, unlabeledSet);
+  numTrain = round(numel(labeledSet)/2);
+  trainSet = labeledSet(1:numTrain);
+  testSet  = labeledSet(numTrain+1:end);
 
-trainData   = mnistData(:, trainSet);
-trainLabels = mnistLabels(trainSet)' + 1; % Shift Labels to the Range 1-5
+  unlabeledData = mnistData(:, unlabeledSet);
 
-testData   = mnistData(:, testSet);
-testLabels = mnistLabels(testSet)' + 1;   % Shift Labels to the Range 1-5
+  trainData   = mnistData(:, trainSet);
+  trainLabels = mnistLabels(trainSet)' + 1; % Shift Labels to the Range 1-5
 
-% Output Some Statistics
-fprintf('# examples in unlabeled set: %d\n', size(unlabeledData, 2));
-fprintf('# examples in supervised training set: %d\n\n', size(trainData, 2));
-fprintf('# examples in supervised testing set: %d\n\n', size(testData, 2));
+  testData   = mnistData(:, testSet);
+  testLabels = mnistLabels(testSet)' + 1;   % Shift Labels to the Range 1-5
 
-%% ======================================================================
-%  STEP 2: Train the sparse autoencoder
-%  This trains the sparse autoencoder on the unlabeled training
-%  images.
+  % Output Some Statistics
+  fprintf('# examples in unlabeled set: %d\n', size(unlabeledData, 2));
+  fprintf('# examples in supervised training set: %d\n\n', size(trainData, 2));
+  fprintf('# examples in supervised testing set: %d\n\n', size(testData, 2));
 
-%  Randomly initialize the parameters
-theta = initializeParameters(hiddenSize, inputSize);
+  %% ======================================================================
+  %  STEP 2: Train the sparse autoencoder
+  %  This trains the sparse autoencoder on the unlabeled training
+  %  images.
 
-%% ----------------- YOUR CODE HERE ----------------------
-%  Find opttheta by running the sparse autoencoder on
-%  unlabeledTrainingImages
+  %  Randomly initialize the parameters
+  theta = initializeParameters(hiddenSize, inputSize);
 
-addpath '../library/minFunc/'
-options.Method = 'lbfgs';
-options.maxIter = 400;
-options.display = 'on';
-[opttheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
-    inputSize, hiddenSize, ...
-    lambda, sparsityParam, ...
-    beta, unlabeledData), ...
-    theta, options);
+  %% ----------------- YOUR CODE HERE ----------------------
+  %  Find opttheta by running the sparse autoencoder on
+  %  unlabeledTrainingImages
 
-%% -----------------------------------------------------
+  addpath '../library/minFunc/'
+  options.Method = 'lbfgs';
+  options.maxIter = 400;
+  options.display = 'on';
+  [opttheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
+      inputSize, hiddenSize, ...
+      lambda, sparsityParam, ...
+      beta, unlabeledData), ...
+      theta, options);
+
+  %% -----------------------------------------------------
+end
+
+if strcmp(METHOD, 'SAVE')
+  save('stl_temp.mat', 'trainSet', 'testSet', 'unlabeledData', 'trainData', ...
+       'trainLabels', 'testData', 'testLabels', 'opttheta');
+end
+
+if strcmp(METHOD, 'LOAD')
+  load('stl_temp.mat');
+end
 
 % Visualize weights
 W1 = reshape(opttheta(1:hiddenSize * inputSize), hiddenSize, inputSize);
@@ -108,18 +124,16 @@ softmaxModel = struct;
 %  classifier.
 
 %  Use lambda = 1e-4 for the weight regularization for softmax
+lambda = 1e-4;
+inputSize = hiddenSize;
+numClasses = numel(unique(trainLabels));
 
 % You need to compute softmaxModel using softmaxTrain on trainFeatures and
 % trainLabels
 
-
-
-
-
-
-
-
-
+options.maxIter = 100;
+softmaxModel = softmaxTrain(inputSize, numClasses, lambda, ...
+                            trainFeatures, trainLabels, options);
 
 %% -----------------------------------------------------
 
@@ -131,7 +145,7 @@ softmaxModel = struct;
 % Compute Predictions on the test set (testFeatures) using softmaxPredict
 % and softmaxModel
 
-
+[pred] = softmaxPredict(softmaxModel, testFeatures);
 
 
 

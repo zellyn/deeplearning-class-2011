@@ -19,10 +19,10 @@ addpath '../library/'
 %  to be used more generally on any arbitrary input.
 %  We also initialise some parameters used for tuning the model.
 
-inputSize = 28 * 28 + 1; % Size of input vector (MNIST images are 28x28)
+inputSize = 28 * 28; % Size of input vector (MNIST images are 28x28)
 numClasses = 10;     % Number of classes (MNIST images fall into 10 classes)
 
-lambda = 1e-3; % Weight decay parameter
+lambda = 1e-4; % Weight decay parameter
 
 %%======================================================================
 %% STEP 1: Load data
@@ -39,7 +39,7 @@ images = loadMNISTImages('../data/train-images-idx3-ubyte');
 labels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
 labels(labels==0) = 10; % Remap 0 to 10
 
-inputData = [ones(1, size(images,2)); images];
+inputData = images;
 
 % For debugging purposes, you may wish to reduce the size of the input data
 % in order to speed up gradient checking.
@@ -115,7 +115,7 @@ images = loadMNISTImages('../data/t10k-images-idx3-ubyte');
 labels = loadMNISTLabels('../data/t10k-labels-idx1-ubyte');
 labels(labels==0) = 10; % Remap 0 to 10
 
-inputData = [ones(1, size(images,2)); images];
+inputData = images;
 
 % You will have to implement softmaxPredict in softmaxPredict.m
 [pred] = softmaxPredict(softmaxModel, inputData);

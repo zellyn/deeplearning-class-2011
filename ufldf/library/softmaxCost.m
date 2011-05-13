@@ -22,27 +22,16 @@ cost = 0;
 %                You need to compute thetagrad and cost.
 %                The groundTruth matrix might come in handy.
 
-% Compute theta^T x
-theta_x = theta * data;
-% Subtract out the max by column so we don't overflow (this'll affect numerator
-% and denominator equally)
-theta_x = bsxfun(@minus, theta_x, max(theta_x, [], 1));
-% e^(theta^T x)
-e_theta_x = exp(theta_x);
-% Normalize
-h_x = bsxfun(@rdivide, e_theta_x, sum(e_theta_x));
+M = theta * data;
+M = bsxfun(@minus, M, max(M));
 
-l_theta_by_col = sum(theta_x .* groundTruth) - log(sum(e_theta_x));
-l_theta = -(1/numCases) * sum(l_theta_by_col);
+p = bsxfun(@rdivide, exp(M), sum(exp(M)));
 
-cost = l_theta + (lambda/2) * sum(sum(theta .^ 2));
+cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
+thetagrad = -1/numCases * (groundTruth - p) * data' + lambda * theta;
 
-diffs = groundTruth - h_x;
-grad_l = -(1/numCases) * diffs * data';
-
-thetagrad = grad_l + lambda * theta;
-
-%% Unroll the gradient matrices into a vector for minFunc
+% ------------------------------------------------------------------
+% Unroll the gradient matrices into a vector for minFunc
 grad = [thetagrad(:)];
 end
 

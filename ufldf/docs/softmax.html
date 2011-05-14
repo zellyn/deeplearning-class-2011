@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>softmax.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>softmax.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<p>Functions for implementing Softmax Regression.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">imports</span> <span class="kn">import</span> <span class="o">*</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Compute the cost function \(J(\theta)\) and gradient \( \nabla_\theta J(\theta) \).</p>
+<ul>
+<li>theta - flattened (numClasses × inputSize) parameters</li>
+<li>num_classes - the number of classes</li>
+<li>input_size - the size N of the input vector</li>
+<li>lamb - weight decay parameter</li>
+<li>data - the N × M input matrix, where each column data(:, i) corresponds to
+  a single test set</li>
+<li>labels - an M × 1 matrix containing the labels corresponding for the input data</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+  <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">input_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">num_cases</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_cases</span><span class="p">])</span>
+  <span class="n">ground_truth</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_cases</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+
+  <span class="n">M</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">M</span> <span class="o">=</span> <span class="n">M</span> <span class="o">-</span> <span class="n">M</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+  <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>$$
+J(\theta) = -\frac{1}{m} \left[
+  \sum_{i=1}^m \sum_{j=1}^k 1\{y^{(i)} = j\} \log \; p(y^{(i)} = j | x^{(i)} ; \theta)
+\right]
++ \frac{\lambda}{2} \sum_{i=1}^k \sum_{j=0}^n \theta_{ij}^2
+$$</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">gt_vec</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">p_vec</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span> <span class="o">*</span> <span class="n">gt_vec</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_vec</span><span class="p">))</span> <span class="o">+</span> <span class="n">lamb</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">theta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>$$
+\nabla_{\theta_j} J(\theta) =
+- \frac{1}{m} \sum_{i=1}^{m}{ \left[
+  x^{(i)} ( 1\{ y^{(i)} = j\}  - p(y^{(i)} = j | x^{(i)}; \theta) )
+\right] }
++ \lambda \theta_j
+$$</p>
+
+<p>…but we vectorize by transposing \(x\).</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">theta_grad</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span> <span class="o">*</span> <span class="p">(</span><span class="n">ground_truth</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">lamb</span> <span class="o">*</span> <span class="n">theta</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Unroll into a vector</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">grad</span> <span class="o">=</span> <span class="n">theta_grad</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">cost</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">grad</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

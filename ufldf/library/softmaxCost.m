@@ -15,7 +15,6 @@ theta = reshape(theta, numClasses, inputSize);
 numCases = size(data, 2);
 
 groundTruth = full(sparse(labels, 1:numCases, 1));
-cost = 0;
 
 %% ---------- YOUR CODE HERE --------------------------------------
 %  Instructions: Compute the cost and gradient for softmax regression.

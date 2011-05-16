@@ -16,7 +16,7 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
-SKIPTO = 0;
+SKIPTO = 5;
 DISPLAY = true;
 
 %%======================================================================
@@ -71,11 +71,11 @@ if SKIPTO <= 2
       beta, trainData), ...
       sae1Theta, options);
 
-  save('sae_save2.mat', 'sae1OptTheta');
+  save('saves/step2.mat', 'sae1OptTheta');
 
   % -------------------------------------------------------------------------
 else
-  load('sae_save2.mat');
+  load('saves/step2.mat');
 end
 
 if DISPLAY
@@ -110,11 +110,11 @@ if SKIPTO <= 3
       beta, sae1Features), ...
       sae2Theta, options);
 
-  save('sae_save3.mat', 'sae2OptTheta');
+  save('saves/step3.mat', 'sae2OptTheta');
 
   % -------------------------------------------------------------------------
 else
-  load('sae_save3.mat')
+  load('saves/step3.mat')
 end
 
 if DISPLAY
@@ -148,17 +148,15 @@ if SKIPTO <= 4
   %        set saeSoftmaxOptTheta = softmaxModel.optTheta(:);
 
   softmaxModel = softmaxTrain(hiddenSizeL2, numClasses, 1e-4, ...
-                              sae2Features, mnistLabels, options);
+                              sae2Features, trainLabels, options);
   saeSoftmaxOptTheta = softmaxModel.optTheta(:);
 
-  save('sae_save4.mat', 'saeSoftmaxOptTheta');
+  save('saves/step4.mat', 'saeSoftmaxOptTheta');
 
   % -------------------------------------------------------------------------
 else
-  load('sae_save4.mat');
+  load('saves/step4.mat');
 end
-
-assert(false);
 
 %%======================================================================
 %% STEP 5: Finetune softmax model

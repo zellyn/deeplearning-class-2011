@@ -2,19 +2,26 @@
 
 %  Instructions
 %  ------------
-% 
+%
 %  This file contains code that helps you get started on the
 %  sstacked autoencoder exercise. You will need to complete code in
 %  stackedAECost.m
-%  You will also need to have implemented sparseAutoencoderCost.m and 
+%  You will also need to have implemented sparseAutoencoderCost.m and
 %  softmaxCost.m from previous exercises.
-%  
-%  For the purpose of completing the assignment, you do not need to
-%  change the code in this file. 
 %
+%  For the purpose of completing the assignment, you do not need to
+%  change the code in this file.
+%
+
+addpath '../library/'
+addpath '../library/minFunc/'
+
+SKIPTO = 0;
+DISPLAY = true;
+
 %%======================================================================
 %% STEP 0: Here we provide the relevant parameters values that will
-%  allow your sparse autoencoder to get good filters; you do not need to 
+%  allow your sparse autoencoder to get good filters; you do not need to
 %  change the parameters below.
 
 inputSize = 28 * 28;
@@ -23,9 +30,9 @@ hiddenSizeL1 = 200;    % Layer 1 Hidden Size
 hiddenSizeL2 = 200;    % Layer 2 Hidden Size
 sparsityParam = 0.1;   % desired average activation of the hidden units.
                        % (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
-		               %  in the lecture notes). 
-lambda = 3e-3;         % weight decay parameter       
-beta = 3;              % weight of sparsity penalty term       
+		               %  in the lecture notes).
+lambda = 3e-3;         % weight decay parameter
+beta = 3;              % weight of sparsity penalty term
 
 %%======================================================================
 %% STEP 1: Load data from the MNIST database
@@ -33,44 +40,48 @@ beta = 3;              % weight of sparsity penalty term
 %  This loads our training data from the MNIST database files.
 
 % Load MNIST database files
-trainData = loadMNISTImages('mnist/train-images-idx3-ubyte');
-trainLabels = loadMNISTLabels('mnist/train-labels-idx1-ubyte');
+trainData = loadMNISTImages('../data/train-images-idx3-ubyte');
+trainLabels = loadMNISTLabels('../data/train-labels-idx1-ubyte');
 
 trainLabels(trainLabels == 0) = 10; % Remap 0 to 10 since our labels need to start from 1
 
-%%======================================================================
-%% STEP 2: Train the first sparse autoencoder
-%  This trains the first sparse autoencoder on the unlabelled STL training
-%  images.
-%  If you've correctly implemented sparseAutoencoderCost.m, you don't need
-%  to change anything here.
+if SKIPTO <= 2
+  %%======================================================================
+  %% STEP 2: Train the first sparse autoencoder
+  %  This trains the first sparse autoencoder on the unlabelled STL training
+  %  images.
+  %  If you've correctly implemented sparseAutoencoderCost.m, you don't need
+  %  to change anything here.
 
 
-%  Randomly initialize the parameters
-sae1Theta = initializeParameters(hiddenSizeL1, inputSize);
+  %  Randomly initialize the parameters
+  sae1Theta = initializeParameters(hiddenSizeL1, inputSize);
 
-%% ---------------------- YOUR CODE HERE  ---------------------------------
-%  Instructions: Train the first layer sparse autoencoder, this layer has
-%                an hidden size of "hiddenSizeL1"
-%                You should store the optimal parameters in sae1Theta
+  %% ---------------------- YOUR CODE HERE  ---------------------------------
+  %  Instructions: Train the first layer sparse autoencoder, this layer has
+  %                an hidden size of "hiddenSizeL1"
+  %                You should store the optimal parameters in sae1Theta
 
+  options.Method = 'lbfgs';
+  options.maxIter = 400;
+  options.display = 'on';
+  [sae1Theta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
+      inputSize, hiddenSizeL1, ...
+      lambda, sparsityParam, ...
+      beta, trainData), ...
+      sae1Theta, options);
 
+  save('sae_save1.mat', 'sae1Theta');
 
+  % -------------------------------------------------------------------------
+else
+  load('sae_save1.mat');
+end
 
-
-
-
-
-
-
-
-
-
-
-
-% -------------------------------------------------------------------------
-
-
+if DISPLAY
+  W1 = reshape(opttheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
+  display_network(W1');
+end
 
 %%======================================================================
 %% STEP 2: Train the second sparse autoencoder
@@ -125,7 +136,7 @@ saeSoftmaxTheta = 0.005 * randn(hiddenSizeL2 * numClasses, 1);
 %                input of dimension "hiddenSizeL2" corresponding to the
 %                hidden layer size of the 2nd layer.
 %
-%                You should store the optimal parameters in saeSoftmaxTheta 
+%                You should store the optimal parameters in saeSoftmaxTheta
 %
 %  NOTE: If you used softmaxTrain to complete this part of the exercise,
 %        set saeSoftmaxTheta = softmaxModel.optTheta(:);
@@ -165,7 +176,7 @@ stackedAETheta = [ saeSoftmaxOptTheta ; stackparams ];
 
 %% ---------------------- YOUR CODE HERE  ---------------------------------
 %  Instructions: Train the deep network, hidden size here refers to the '
-%                dimension of the input to the classifier, which corresponds 
+%                dimension of the input to the classifier, which corresponds
 %                to "hiddenSizeL2".
 %
 %
@@ -191,15 +202,15 @@ stackedAETheta = [ saeSoftmaxOptTheta ; stackparams ];
 
 
 %%======================================================================
-%% STEP 6: Test 
+%% STEP 6: Test
 %  Instructions: You will need to complete the code in stackedAEPredict.m
 %                before running this part of the code
 %
 
 % Get labelled test images
 % Note that we apply the same kind of preprocessing as the training set
-testData = loadMNISTImages('mnist/t10k-images-idx3-ubyte');
-testLabels = loadMNISTLabels('mnist/t10k-labels-idx1-ubyte');
+testData = loadMNISTImages('../data/t10k-images-idx3-ubyte');
+testLabels = loadMNISTLabels('../data/t10k-labels-idx1-ubyte');
 
 testLabels(testLabels == 0) = 10; % Remap 0 to 10
 
@@ -221,7 +232,7 @@ fprintf('After Finetuning Test Accuracy: %0.3f%%\n', acc * 100);
 % Before Finetuning Test Accuracy: XX.XXXX%
 % After Finetuning Test Accuracy: XX.XXXX%
 %
-% If your values are too low (accuracy less than X.XX), you should check 
-% your code for errors, and make sure you are training on the 
-% entire data set of 60000 28x28 training images 
+% If your values are too low (accuracy less than X.XX), you should check
+% your code for errors, and make sure you are training on the
+% entire data set of 60000 28x28 training images
 % (unless you modified the loading code, this should be the case)

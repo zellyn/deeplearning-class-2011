@@ -60,18 +60,18 @@ if SKIPTO <= 2
   %% ---------------------- YOUR CODE HERE  ---------------------------------
   %  Instructions: Train the first layer sparse autoencoder, this layer has
   %                an hidden size of "hiddenSizeL1"
-  %                You should store the optimal parameters in sae1Theta
+  %                You should store the optimal parameters in sae1OptTheta
 
   options.Method = 'lbfgs';
   options.maxIter = 400;
   options.display = 'on';
-  [sae1Theta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
+  [sae1OptTheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
       inputSize, hiddenSizeL1, ...
       lambda, sparsityParam, ...
       beta, trainData), ...
       sae1Theta, options);
 
-  save('sae_save1.mat', 'sae1Theta');
+  save('sae_save1.mat', 'sae1OptTheta');
 
   % -------------------------------------------------------------------------
 else
@@ -79,47 +79,54 @@ else
 end
 
 if DISPLAY
-  W1 = reshape(opttheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
+  W1 = reshape(sae1OptTheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
   display_network(W1');
 end
 
+if SKIPTO <= 3
+  %%======================================================================
+  %% STEP 3: Train the second sparse autoencoder
+  %  This trains the second sparse autoencoder on the first autoencoder
+  %  featurse.
+  %  If you've correctly implemented sparseAutoencoderCost.m, you don't need
+  %  to change anything here.
+
+  [sae1Features] = feedForwardAutoencoder(sae1OptTheta, hiddenSizeL1, ...
+                                          inputSize, trainData);
+
+  %  Randomly initialize the parameters
+  sae2Theta = initializeParameters(hiddenSizeL2, hiddenSizeL1);
+
+  %% ---------------------- YOUR CODE HERE  ---------------------------------
+  %  Instructions: Train the second layer sparse autoencoder, this layer has
+  %                an hidden size of "hiddenSizeL2" and an inputsize of
+  %                "hiddenSizeL1"
+  %
+  %                You should store the optimal parameters in sae2OptTheta
+
+  [sae2OptTheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
+      hiddenSizeL1, hiddenSizeL2, ...
+      lambda, sparsityParam, ...
+      beta, sae1Features), ...
+      sae2Theta, options);
+
+  save('sae_save2.mat', 'sae2OptTheta');
+
+  % -------------------------------------------------------------------------
+else
+  load('sae_save2.mat')
+end
+
+if DISPLAY
+  W1 = reshape(sae1OptTheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
+  % TODO(zellyn): figure out how to display second network
+  % display_network(W1');
+end
+
+assert(false);
+
 %%======================================================================
-%% STEP 2: Train the second sparse autoencoder
-%  This trains the second sparse autoencoder on the first autoencoder
-%  featurse.
-%  If you've correctly implemented sparseAutoencoderCost.m, you don't need
-%  to change anything here.
-
-[sae1Features] = feedForwardAutoencoder(sae1OptTheta, hiddenSizeL1, ...
-                                        inputSize, trainData);
-
-%  Randomly initialize the parameters
-sae2Theta = initializeParameters(hiddenSizeL2, hiddenSizeL1);
-
-%% ---------------------- YOUR CODE HERE  ---------------------------------
-%  Instructions: Train the second layer sparse autoencoder, this layer has
-%                an hidden size of "hiddenSizeL2" and an inputsize of
-%                "hiddenSizeL1"
-%
-%                You should store the optimal parameters in sae2Theta
-
-
-
-
-
-
-
-
-
-
-
-
-
-% -------------------------------------------------------------------------
-
-
-%%======================================================================
-%% STEP 3: Train the softmax classifier
+%% STEP 4: Train the softmax classifier
 %  This trains the sparse autoencoder on the second autoencoder features.
 %  If you've correctly implemented softmaxCost.m, you don't need
 %  to change anything here.

@@ -71,11 +71,11 @@ if SKIPTO <= 2
       beta, trainData), ...
       sae1Theta, options);
 
-  save('sae_save1.mat', 'sae1OptTheta');
+  save('sae_save2.mat', 'sae1OptTheta');
 
   % -------------------------------------------------------------------------
 else
-  load('sae_save1.mat');
+  load('sae_save2.mat');
 end
 
 if DISPLAY
@@ -83,17 +83,17 @@ if DISPLAY
   display_network(W1');
 end
 
+%%======================================================================
+%% STEP 3: Train the second sparse autoencoder
+%  This trains the second sparse autoencoder on the first autoencoder
+%  featurse.
+%  If you've correctly implemented sparseAutoencoderCost.m, you don't need
+%  to change anything here.
+
+[sae1Features] = feedForwardAutoencoder(sae1OptTheta, hiddenSizeL1, ...
+                                        inputSize, trainData);
+
 if SKIPTO <= 3
-  %%======================================================================
-  %% STEP 3: Train the second sparse autoencoder
-  %  This trains the second sparse autoencoder on the first autoencoder
-  %  featurse.
-  %  If you've correctly implemented sparseAutoencoderCost.m, you don't need
-  %  to change anything here.
-
-  [sae1Features] = feedForwardAutoencoder(sae1OptTheta, hiddenSizeL1, ...
-                                          inputSize, trainData);
-
   %  Randomly initialize the parameters
   sae2Theta = initializeParameters(hiddenSizeL2, hiddenSizeL1);
 
@@ -110,11 +110,11 @@ if SKIPTO <= 3
       beta, sae1Features), ...
       sae2Theta, options);
 
-  save('sae_save2.mat', 'sae2OptTheta');
+  save('sae_save3.mat', 'sae2OptTheta');
 
   % -------------------------------------------------------------------------
 else
-  load('sae_save2.mat')
+  load('sae_save3.mat')
 end
 
 if DISPLAY
@@ -122,8 +122,6 @@ if DISPLAY
   % TODO(zellyn): figure out how to display second network
   % display_network(W1');
 end
-
-assert(false);
 
 %%======================================================================
 %% STEP 4: Train the softmax classifier
@@ -134,33 +132,33 @@ assert(false);
 [sae2Features] = feedForwardAutoencoder(sae2OptTheta, hiddenSizeL2, ...
                                         hiddenSizeL1, sae1Features);
 
-%  Randomly initialize the parameters
-saeSoftmaxTheta = 0.005 * randn(hiddenSizeL2 * numClasses, 1);
+if SKIPTO <= 4
+  %  Randomly initialize the parameters
+  saeSoftmaxTheta = 0.005 * randn(hiddenSizeL2 * numClasses, 1);
 
 
-%% ---------------------- YOUR CODE HERE  ---------------------------------
-%  Instructions: Train the softmax classifier, the classifier takes in
-%                input of dimension "hiddenSizeL2" corresponding to the
-%                hidden layer size of the 2nd layer.
-%
-%                You should store the optimal parameters in saeSoftmaxTheta
-%
-%  NOTE: If you used softmaxTrain to complete this part of the exercise,
-%        set saeSoftmaxTheta = softmaxModel.optTheta(:);
+  %% ---------------------- YOUR CODE HERE  ---------------------------------
+  %  Instructions: Train the softmax classifier, the classifier takes in
+  %                input of dimension "hiddenSizeL2" corresponding to the
+  %                hidden layer size of the 2nd layer.
+  %
+  %                You should store the optimal parameters in saeSoftmaxOptTheta
+  %
+  %  NOTE: If you used softmaxTrain to complete this part of the exercise,
+  %        set saeSoftmaxOptTheta = softmaxModel.optTheta(:);
 
+  softmaxModel = softmaxTrain(hiddenSizeL2, numClasses, 1e-4, ...
+                              sae2Features, mnistLabels, options);
+  saeSoftmaxOptTheta = softmaxModel.optTheta(:);
 
+  save('sae_save4.mat', 'saeSoftmaxOptTheta');
 
+  % -------------------------------------------------------------------------
+else
+  load('sae_save4.mat');
+end
 
-
-
-
-
-
-
-
-% -------------------------------------------------------------------------
-
-
+assert(false);
 
 %%======================================================================
 %% STEP 5: Finetune softmax model

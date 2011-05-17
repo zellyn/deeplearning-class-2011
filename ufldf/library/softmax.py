@@ -2,8 +2,8 @@
 # <script type="text/javascript"
 #   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 # </script>
-#
-# Functions for implementing Softmax Regression.
+# Functions for implementing Softmax Regression. See
+# [softmax_exercise.py](softmax_exercise.html) for a running example.
 
 from imports import *
 
@@ -51,3 +51,33 @@ def cost(theta, num_classes, input_size, lamb, data, labels):
   grad = theta_grad.ravel('F')
   return cost[0][0], grad
 
+# Use `cost()` to train a network using l-bfgs.
+#
+# - input_size - the size N of the input vector
+# - num_classes - the number of classes
+# - lamb - weight decay parameter
+# - input_data - the N × M input matrix, where each column data(:, i) corresponds to
+#   a single test set
+# - labels - an M × 1 matrix containing the labels corresponding for the input data
+# - max_iter - maximum number of iterations for l-bfgs
+def train(input_size, num_classes, lamb, input_data, labels, max_iter=400):
+  theta = 0.005 * np.random.randn(num_classes * input_size, 1)
+  theta = np.asfortranarray(theta)
+
+  fn = lambda theta: cost(theta, num_classes, input_size, lamb, input_data, labels)
+
+  softmax_opt_theta, f, d = scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=max_iter, iprint=25, m=20)
+
+  return dict(opt_theta = softmax_opt_theta.reshape([num_classes, input_size], order='F'),
+              input_size = input_size,
+              num_classes = num_classes)
+
+# Given a trained model and data, return the prediction matrix
+# \\( pred_i = \\mathop{\\arg\\!\\max}\\limits_c \\,P(y^{(i)} = c | x^{(i)}) \\):
+#
+# - model - model trained using train()
+# - input_data - the N × M input matrix, where each column data(:, i)
+#   corresponds to a single test set
+def predict(model, input_data):
+  theta = model['opt_theta']
+  return (theta.dot(input_data)).argmax(0)

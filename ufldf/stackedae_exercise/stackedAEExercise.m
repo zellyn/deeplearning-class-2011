@@ -118,9 +118,9 @@ else
 end
 
 if DISPLAY
-  W1 = reshape(sae1OptTheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
-  % TODO(zellyn): figure out how to display second network
-  % display_network(W1');
+  W11 = reshape(sae1OptTheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
+  W12 = reshape(sae2OptTheta(1:hiddenSizeL2 * hiddenSizeL1), hiddenSizeL2, hiddenSizeL1);
+  display_network(log(1 ./ (1-W11')) * W12')
 end
 
 %%======================================================================
@@ -239,3 +239,4 @@ fprintf('After Finetuning Test Accuracy: %0.3f%%\n', acc * 100);
 % your code for errors, and make sure you are training on the
 % entire data set of 60000 28x28 training images
 % (unless you modified the loading code, this should be the case)
+

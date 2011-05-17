@@ -38,7 +38,6 @@ for the Deep Learning class.</p>
     <div class='code'>
       <div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">library.imports</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">mnist</span>
@@ -52,7 +51,7 @@ for the Deep Learning class.</p>
         <a class='octothorpe' href='#section-2'>#</a>
       </div>
       <h3><span id="step-0:-initialize-constants-and-parameters" href="step-0:-initialize-constants-and-parameters"> Step 0: Initialize constants and parameters </span></h3>
-<p>Here we define and initialise some constants which allow your code
+<p>Here we define and initialise some constants which allow the code
  to be used more generally on any arbitrary input.  We also
  initialise some parameters used for tuning the model.</p>
     </div>
@@ -83,12 +82,12 @@ for the Deep Learning class.</p>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-4'>#</a>
       </div>
-      <p>For debugging purposes, you may wish to reduce the size of the input
-data in order to speed up gradient checking.  Here, we consider only
-8 pixels of the images, and only the first 100 images.</p>
+      <p>For debugging purposes, reduce the size of the input data in order
+to speed up gradient checking.  Here, we consider only the eight
+most-varying pixels of the images, and only the first 100 images.</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+      <div class="highlight"><pre><span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">False</span>
 <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
   <span class="n">input_size</span> <span class="o">=</span> <span class="mi">8</span></pre></div>
     </div>
@@ -114,7 +113,7 @@ data in order to speed up gradient checking.  Here, we consider only
     </div>
     <div class='code'>
       <div class="highlight"><pre>  <span class="n">indices</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[</span><span class="o">-</span><span class="n">input_size</span><span class="p">:]</span>
-  <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span></pre></div>
+  <span class="n">input_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:])</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-7'>
@@ -134,7 +133,7 @@ data in order to speed up gradient checking.  Here, we consider only
         <a class='octothorpe' href='#section-8'>#</a>
       </div>
       <h3><span id="step-2:-implement-softmaxcost" href="step-2:-implement-softmaxcost"> Step 2: Implement softmaxCost </span></h3>
-<p>Implement softmaxCost in <a href="softmax.html#section-1">softmax.cost()</a></p>
+<p>Implement softmaxCost in <a href="softmax.html#section-1">softmax.cost()</a>.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="n">cost</span><span class="p">,</span> <span class="n">grad</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span></pre></div>
@@ -146,8 +145,8 @@ data in order to speed up gradient checking.  Here, we consider only
         <a class='octothorpe' href='#section-9'>#</a>
       </div>
       <h3><span id="step-3:-gradient-checking" href="step-3:-gradient-checking"> Step 3: Gradient checking </span></h3>
-<p>As with any learning algorithm, you should always check that your
- gradients are correct before learning the parameters.</p>
+<p>As with any learning algorithm, always check that the gradients are
+ correct before learning the parameters.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -207,13 +206,38 @@ data in order to speed up gradient checking.  Here, we consider only
         <a class='octothorpe' href='#section-14'>#</a>
       </div>
       <h3><span id="step-4:-learning-parameters" href="step-4:-learning-parameters"> Step 4: Learning parameters </span></h3>
-<p>Once you have verified that your gradients are correct, you can
- start training your softmax regression code using softmax.train</p>
+<p>Once the gradients are correct, we start training using
+ <a href="softmax.html#section-5">softmax.train()</a>.</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="n">options</span><span class="o">.</span><span class="n">maxIter</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
-<span class="n">softmax_model</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span>
-                              <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+      <div class="highlight"><pre><span class="n">softmax_model</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span>
+                              <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <h3><span id="step-5:-testing" href="step-5:-testing"> Step 5: Testing </span></h3>
+<p>Test the model against the test images, using
+ <a href="softmax.html#section-6">softmax.predict()</a>, which returns
+ predictions given a softmax model and the input data.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">images</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_images</span><span class="p">(</span><span class="s">&#39;../data/t10k-images-idx3-ubyte&#39;</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s">&#39;../data/t10k-labels-idx1-ubyte&#39;</span><span class="p">)</span>
+<span class="n">input_data</span> <span class="o">=</span> <span class="n">images</span>
+
+<span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
+  <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">100</span><span class="p">]</span>
+  <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span>
+  <span class="n">input_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:])</span>
+
+<span class="n">pred</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">softmax_model</span><span class="p">,</span> <span class="n">input_data</span><span class="p">)</span>
+<span class="n">acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">pred</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;Accuracy: </span><span class="si">%0.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">acc</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
 
 </pre></div>
     </div>

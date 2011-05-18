@@ -1,18 +1,18 @@
 function [ cost, grad ] = stackedAECost(theta, inputSize, hiddenSize, ...
                                               numClasses, netconfig, ...
                                               lambda, data, labels)
-                                         
+
 % stackedAECost: Takes a trained softmaxTheta and a training data set with labels,
 % and returns cost and gradient using a stacked autoencoder model. Used for
 % finetuning.
-                                         
+
 % theta: trained weights from the autoencoder
 % visibleSize: the number of input units
 % hiddenSize:  the number of hidden units *at the 2nd layer*
 % numClasses:  the number of categories
 % netconfig:   the network configuration of the stack
 % lambda:      the weight regularization penalty
-% data: Our matrix containing the training data as columns.  So, data(:,i) is the i-th training example. 
+% data: Our matrix containing the training data as columns.  So, data(:,i) is the i-th training example.
 % labels: A vector containing labels, where labels(i) is the label for the
 % i-th training example
 
@@ -36,12 +36,12 @@ end
 cost = 0; % You need to compute this
 
 % You might find these variables useful
-M = size(data, 2);
-groundTruth = full(sparse(labels, 1:M, 1));
+numCases = size(data, 2);
+groundTruth = full(sparse(labels, 1:numCases, 1));
 
 
 %% --------------------------- YOUR CODE HERE -----------------------------
-%  Instructions: Compute the cost function and gradient vector for 
+%  Instructions: Compute the cost function and gradient vector for
 %                the stacked autoencoder.
 %
 %                You are given a stack variable which is a cell-array of
@@ -61,11 +61,24 @@ groundTruth = full(sparse(labels, 1:M, 1));
 %                match exactly that of the size of the matrices in stack.
 %
 
+depth = numel(stack);
+z = cell(depth+1,1);
+a = cell(depth+1, 1);
+a{1} = data;
 
+for layer = (2:depth)
+  z{layer+1} = stack{layer}.w * a{layer} + repmat(stack{layer}.b, [1, size(a{layer},2)]);
+  a{layer+1} = sigmoid(z{layer+1});
+end
 
+M = softmaxTheta * a{depth+1};
+M = bsxfun(@minus, M, max(M));
+p = bsxfun(@rdivide, exp(M), sum(exp(M)));
 
+cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
+softmaxThetaGrad = -1/numCases * (groundTruth - p) * data' + lambda * theta;
 
-
+TODO-zjh - implement
 
 
 

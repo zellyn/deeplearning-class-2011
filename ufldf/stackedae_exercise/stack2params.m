@@ -16,11 +16,11 @@ function [params, netconfig] = stack2params(stack)
 % Setup the compressed param vector
 params = [];
 for d = 1:numel(stack)
-    
+
     % This can be optimized. But since our stacks are relatively short, it
     % is okay
     params = [params ; stack{d}.w(:) ; stack{d}.b(:) ];
-    
+
     % Check that stack is of the correct form
     assert(size(stack{d}.w, 1) == size(stack{d}.b, 1), ...
         ['The bias should be a *column* vector of ' ...
@@ -30,7 +30,7 @@ for d = 1:numel(stack)
             ['The adjacent layers L' int2str(d) ' and L' int2str(d+1) ...
              ' should have matching sizes.']);
     end
-    
+
 end
 
 if nargout > 1
@@ -42,7 +42,7 @@ if nargout > 1
         netconfig.inputsize = size(stack{1}.w, 2);
         netconfig.layersizes = {};
         for d = 1:numel(stack)
-            netconfig.layersizes = [netconfig.layersizes ; size(stack{d}.w,1)];
+            netconfig.layersizes{numel(netconfig.layersizes)+1} = size(stack{d}.w,1);
         end
     end
 end

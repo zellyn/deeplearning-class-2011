@@ -61,33 +61,33 @@ groundTruth = full(sparse(labels, 1:numCases, 1));
 %                match exactly that of the size of the matrices in stack.
 %
 
-depth = numel(stack);
-z = cell(depth+1,1);
-a = cell(depth+1, 1);
-a{1} = data;
-
-for layer = (2:depth)
-  z{layer+1} = stack{layer}.w * a{layer} + repmat(stack{layer}.b, [1, size(a{layer},2)]);
-  a{layer+1} = sigmoid(z{layer+1});
-end
-
-M = softmaxTheta * a{depth+1};
-M = bsxfun(@minus, M, max(M));
-p = bsxfun(@rdivide, exp(M), sum(exp(M)));
-
-cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
-softmaxThetaGrad = -1/numCases * (groundTruth - p) * data' + lambda * theta;
-
-TODO-zjh - implement
-
-
-
-
-
-
-
-
-
+%%% depth = numel(stack);
+%%% z = cell(depth+1,1);
+%%% a = cell(depth+1, 1);
+%%% a{1} = data;
+%%%
+%%% for layer = (2:depth)
+%%%   z{layer+1} = stack{layer}.w * a{layer} + repmat(stack{layer}.b, [1, size(a{layer},2)]);
+%%%   a{layer+1} = sigmoid(z{layer+1});
+%%% end
+%%%
+%%% M = softmaxTheta * a{depth+1};
+%%% M = bsxfun(@minus, M, max(M));
+%%% p = bsxfun(@rdivide, exp(M), sum(exp(M)));
+%%%
+%%% cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
+%%% softmaxThetaGrad = -1/numCases * (groundTruth - p) * data' + lambda * theta;
+%%%
+%%% d = cell(depth+1);
+%%%
+%%% d{depth+1} = softmaxThetaGrad;
+%%%
+%%% for layer = (1:depth)
+%%%   stackgrad{layer}.w = (1/numCases) * d{layer+1} * a{layer}';
+%%%   stackgrad{layer}.b = (1/numCases) * sum(d{layer+1}, 2);
+%%%   d{layer} = (stackgrad{layer}.w' * d{layer+1}) .* a{layer} .* (1-a{layer});
+%%% end
+%%%
 % -------------------------------------------------------------------------
 
 %% Roll gradient vector

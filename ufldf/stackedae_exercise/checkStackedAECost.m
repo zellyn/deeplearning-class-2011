@@ -12,8 +12,8 @@ addpath '../library/'
 inputSize = 4;
 hiddenSize = 5;
 lambda = 0.01;
-data   = randn(inputSize, 5);
-labels = [ 1 2 1 2 1 ];
+data   = randn(inputSize, 7);
+labels = [ 1 2 1 2 1 2 1];
 numClasses = 2;
 
 stack = cell(2,1);
@@ -26,7 +26,6 @@ softmaxTheta = 0.005 * randn(hiddenSize * numClasses, 1);
 [stackparams, netconfig] = stack2params(stack);
 stackedAETheta = [ softmaxTheta ; stackparams ];
 
-
 [cost, grad] = stackedAECost(stackedAETheta, inputSize, hiddenSize, ...
                              numClasses, netconfig, ...
                              lambda, data, labels);
@@ -38,7 +37,7 @@ numgrad = computeNumericalGradient( @(x) stackedAECost(x, inputSize, ...
                                         stackedAETheta);
 
 % Use this to visually compare the gradients side by side
-disp([numgrad grad]);
+disp([numgrad grad (numgrad-grad) (numgrad ./ grad)]);
 
 % Compare numerically computed gradients with the ones obtained from backpropagation
 disp('Norm between numerical and analytical gradient (should be less than 1e-9)');

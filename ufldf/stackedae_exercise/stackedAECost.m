@@ -66,7 +66,7 @@ z = cell(depth+1,1);
 a = cell(depth+1, 1);
 a{1} = data;
 
-for layer = (2:depth)
+for layer = (1:depth)
   z{layer+1} = stack{layer}.w * a{layer} + repmat(stack{layer}.b, [1, size(a{layer},2)]);
   a{layer+1} = sigmoid(z{layer+1});
 end
@@ -76,16 +76,24 @@ M = bsxfun(@minus, M, max(M));
 p = bsxfun(@rdivide, exp(M), sum(exp(M)));
 
 cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
-softmaxThetaGrad = -1/numCases * (groundTruth - p) * data' + lambda * theta;
+softmaxThetaGrad = -1/numCases * (groundTruth - p) * a{depth+1}' + lambda * softmaxTheta;
 
 d = cell(depth+1);
 
-d{depth+1} = softmaxThetaGrad;
+% fprintf('softmaxTheta: '); disp(size(softmaxTheta));
+% fprintf('softmaxThetaGrad: '); disp(size(softmaxThetaGrad));
+% fprintf('a{depth+1}: '); disp(size(a{depth+1}));
+% fprintf('groundTruth: '); disp(size(groundTruth));
 
-for layer = (1:depth)
+d{depth+1} = -(softmaxTheta' * (groundTruth - p)) .* a{depth+1} .* (1-a{depth+1});
+
+for layer = (depth:-1:2)
+  d{layer} = (stack{layer}.w' * d{layer+1}) .* a{layer} .* (1-a{layer});
+end
+
+for layer = (depth:-1:1)
   stackgrad{layer}.w = (1/numCases) * d{layer+1} * a{layer}';
   stackgrad{layer}.b = (1/numCases) * sum(d{layer+1}, 2);
-  d{layer} = (stackgrad{layer}.w' * d{layer+1}) .* a{layer} .* (1-a{layer});
 end
 
 % -------------------------------------------------------------------------

@@ -1,13 +1,13 @@
 function stack = params2stack(params, netconfig)
 
-% Converts a flattened parameter vector into a nice "stack" structure 
+% Converts a flattened parameter vector into a nice "stack" structure
 % for us to work with. This is useful when you're building multilayer
 % networks.
 %
 % stack = params2stack(params, netconfig)
 %
 % params - flattened parameter vector
-% netconfig - auxiliary variable containing 
+% netconfig - auxiliary variable containing
 %             the configuration of the network
 %
 
@@ -31,7 +31,7 @@ for d = 1:depth
     blen = double(netconfig.layersizes{d});
     stack{d}.b = reshape(params(curPos:curPos+blen-1), netconfig.layersizes{d}, 1);
     curPos = curPos+blen;
-    
+
     % Set previous layer size
     prevLayerSize = netconfig.layersizes{d};
 end

@@ -16,8 +16,12 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
-SKIPTO = 5;
+SKIPTO = 6;
 DISPLAY = true;
+
+options.Method = 'lbfgs';
+options.maxIter = 400;
+options.display = 'on';
 
 %%======================================================================
 %% STEP 0: Here we provide the relevant parameters values that will
@@ -62,9 +66,6 @@ if SKIPTO <= 2
   %                an hidden size of "hiddenSizeL1"
   %                You should store the optimal parameters in sae1OptTheta
 
-  options.Method = 'lbfgs';
-  options.maxIter = 400;
-  options.display = 'on';
   [sae1OptTheta, loss] = minFunc( @(p) sparseAutoencoderLoss(p, ...
       inputSize, hiddenSizeL1, ...
       lambda, sparsityParam, ...
@@ -120,7 +121,8 @@ end
 if DISPLAY
   W11 = reshape(sae1OptTheta(1:hiddenSizeL1 * inputSize), hiddenSizeL1, inputSize);
   W12 = reshape(sae2OptTheta(1:hiddenSizeL2 * hiddenSizeL1), hiddenSizeL2, hiddenSizeL1);
-  display_network(log(1 ./ (1-W11')) * W12')
+  % TODO(zellyn): figure out how to display a 2-level network
+  % display_network(log(W11' ./ (1-W11')) * W12');
 end
 
 %%======================================================================
@@ -131,7 +133,6 @@ end
 
 [sae2Features] = feedForwardAutoencoder(sae2OptTheta, hiddenSizeL2, ...
                                         hiddenSizeL1, sae1Features);
-
 if SKIPTO <= 4
   %  Randomly initialize the parameters
   saeSoftmaxTheta = 0.005 * randn(hiddenSizeL2 * numClasses, 1);
@@ -184,12 +185,26 @@ stackedAETheta = [ saeSoftmaxOptTheta ; stackparams ];
 %
 %
 
-[stackedAEOptTheta, loss] = minFunc( @(x) stackedAECost(x, ...
-    inputSize, hiddenSizeL2, numClasses, netconfig,
-    lambda, trainData, trainLabels)
+if SKIPTO <= 5
+  [stackedAEOptTheta, loss] = minFunc( @(x) stackedAECost(x, ...
+      inputSize, hiddenSizeL2, numClasses, netconfig, ...
+      lambda, trainData, trainLabels), ...
+      stackedAETheta, options);
+
+  save('saves/step5.mat', 'stackedAEOptTheta');
+else
+  load('saves/step5.mat');
+end
 
 % -------------------------------------------------------------------------
 
+if DISPLAY
+  optStack = params2stack(stackedAEOptTheta(hiddenSizeL2*numClasses+1:end), netconfig);
+  W11 = optStack{1}.w;
+  W12 = optStack{2}.w;
+  % TODO(zellyn): figure out how to display a 2-level network
+  % display_network(log(1 ./ (1-W11')) * W12');
+end
 
 
 %%======================================================================

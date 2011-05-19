@@ -24,9 +24,6 @@ stack = params2stack(theta(hiddenSize*numClasses+1:end), netconfig);
 %  Instructions: Compute pred using theta assuming that the labels start
 %                from 1.
 
-numCases = size(data, 2);
-groundTruth = full(sparse(labels, 1:numCases, 1));
-
 depth = numel(stack);
 z = cell(depth+1,1);
 a = cell(depth+1, 1);

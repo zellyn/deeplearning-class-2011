@@ -26,14 +26,7 @@ softmaxTheta = reshape(theta(1:hiddenSize*numClasses), numClasses, hiddenSize);
 stack = params2stack(theta(hiddenSize*numClasses+1:end), netconfig);
 
 % You will need to compute the following gradients
-softmaxThetaGrad = zeros(size(softmaxTheta));
 stackgrad = cell(size(stack));
-for d = 1:numel(stack)
-    stackgrad{d}.w = zeros(size(stack{d}.w));
-    stackgrad{d}.b = zeros(size(stack{d}.b));
-end
-
-cost = 0; % You need to compute this
 
 % You might find these variables useful
 numCases = size(data, 2);
@@ -75,7 +68,7 @@ M = softmaxTheta * a{depth+1};
 M = bsxfun(@minus, M, max(M));
 p = bsxfun(@rdivide, exp(M), sum(exp(M)));
 
-cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(theta(:) .^ 2);
+cost = -1/numCases * groundTruth(:)' * log(p(:)) + lambda/2 * sum(softmaxTheta(:) .^ 2);
 softmaxThetaGrad = -1/numCases * (groundTruth - p) * a{depth+1}' + lambda * softmaxTheta;
 
 d = cell(depth+1);

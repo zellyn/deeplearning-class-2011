@@ -7,8 +7,7 @@ function [ cost, grad ] = stackedAECost(theta, inputSize, hiddenSize, ...
 % finetuning.
 
 % theta: trained weights from the autoencoder
-% visibleSize: the number of input units
-% hiddenSize:  the number of hidden units *at the 2nd layer*
+% hiddenSize:  the number of hidden units *at the last layer*
 % numClasses:  the number of categories
 % netconfig:   the network configuration of the stack
 % lambda:      the weight regularization penalty

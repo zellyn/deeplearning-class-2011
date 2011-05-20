@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>stackedae_exercise.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>stackedae_exercise.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>My implementation of the <a href="http://ufldl.stanford.edu/wiki/index.php/Exercise:_Implement_deep_networks_for_digit_classification">Stacked autoencoder deep network exercise</a>
+for the Deep Learning class.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">library.imports</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">mnist</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">softmax</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">util</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3><span id="step-0:-initialize-constants-and-parameters" href="step-0:-initialize-constants-and-parameters"> Step 0: Initialize constants and parameters </span></h3>
+<ul>
+<li><code>hidden_size_l1</code> - layer 1 hidden size</li>
+<li><code>hidden_size_l2</code> - layer 2 hidden size</li>
+<li><code>sparsity_param</code> - desired average activation of the hidden units
+  (\(\rho\) in the lecture notes)</li>
+<li><code>lamb</code> - weight decay parameter</li>
+<li><code>beta</code> - weight of sparsity penalty term</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">input_size</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">hidden_size_l1</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">hidden_size_l2</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">sparsity_param</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">lamb</span> <span class="o">=</span> <span class="mf">3e-3</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mi">3</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3><span id="step-1:-load-data-from-the-mnist-database" href="step-1:-load-data-from-the-mnist-database"> Step 1: Load data from the MNIST database </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">train_data</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_images</span><span class="p">(</span><span class="s">&#39;../data/train-images-idx3-ubyte&#39;</span><span class="p">)</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s">&#39;../data/train-labels-idx1-ubyte&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <h3><span id="step-2:-train-the-first-sparse-autoencoder" href="step-2:-train-the-first-sparse-autoencoder"> Step 2: Train the first sparse autoencoder </span></h3>
+<p>Train the first sparse autoencoder on the unlabelled STL training
+images.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Randomly initialize the parameters</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sae1_theta</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Train the first layer sparse autoencoder. This layer has a hidden
+size of <code>hidden_size_l1</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>sae1_opt_theta, loss = minFunc( @(p) sparseAutoencoderLoss(p, ...
+    inputSize, hiddenSizeL1, ...
+    lambda, sparsityParam, ...
+    beta, trainData), ...
+    sae1Theta, options);</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

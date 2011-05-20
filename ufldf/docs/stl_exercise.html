@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>stl_exercise.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>stl_exercise.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>My implementation of the <a href="http://ufldl.stanford.edu/wiki/index.php/Exercise:Self-Taught_Learning">Self-taught learning
+exercise</a>
+for the Deep Learning class.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">library.imports</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">mnist</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">softmax</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">autoencoder</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3><span id="step-0:-initialize-constants-and-parameters" href="step-0:-initialize-constants-and-parameters"> Step 0: Initialize constants and parameters </span></h3>
+<ul>
+<li><code>sparsity_param</code> - desired average activation of the hidden units
+  (\(\rho\) in the lecture notes)</li>
+<li><code>lamb</code> - weight decay parameter</li>
+<li><code>beta</code> - weight of sparsity penalty term</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">input_size</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span>
+<span class="n">num_labels</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">sparsity_param</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">lamb</span> <span class="o">=</span> <span class="mf">3e-3</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c"># 400</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3><span id="step-1:-load-data" href="step-1:-load-data"> Step 1: Load data </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span> <span class="s">&#39;Loading raw MNIST data...&#39;</span>
+<span class="n">mnist_data</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_images</span><span class="p">(</span><span class="s">&#39;../data/train-images-idx3-ubyte&#39;</span><span class="p">)</span>
+<span class="n">mnist_labels</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s">&#39;../data/train-labels-idx1-ubyte&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Simulate a Labeled and Unlabeled set</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span> <span class="s">&#39;Splitting MNIST data...&#39;</span>
+<span class="n">labeled_set</span> <span class="o">=</span> <span class="n">mnist_labels</span> <span class="o">&lt;=</span> <span class="mi">4</span>
+<span class="n">unlabeled_set</span> <span class="o">=</span> <span class="n">mnist_labels</span> <span class="o">&gt;=</span> <span class="mi">5</span>
+
+<span class="n">unlabeled_data</span> <span class="o">=</span> <span class="n">mnist_data</span><span class="p">[:,</span> <span class="n">unlabeled_set</span><span class="p">]</span>
+<span class="n">labeled_data</span> <span class="o">=</span> <span class="n">mnist_data</span><span class="p">[:,</span> <span class="n">labeled_set</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">mnist_labels</span><span class="p">[</span><span class="n">labeled_set</span><span class="p">]</span>
+
+<span class="n">num_train</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">2</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">labeled_data</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_train</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:</span><span class="n">num_train</span><span class="p">]</span>
+
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">labeled_data</span><span class="p">[:,</span> <span class="n">num_train</span><span class="p">:]</span>
+<span class="n">test_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">num_train</span><span class="p">:]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Output some statistics</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span> <span class="s">&#39;# examples in unlabeled set: </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">unlabeled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&#39;# examples in supervised training set: </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">train_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&#39;# examples in supervised testing set: </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">test_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <h3><span id="step-2:-train-the-sparse-autoencoder" href="step-2:-train-the-sparse-autoencoder"> Step 2: Train the sparse autoencoder </span></h3>
+<p>This trains the sparse autoencoder on the unlabeled training images.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Randomly initialize the parameters</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">theta</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>The single-parameter function to minimize</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">sparse_autoencoder_loss</span><span class="p">(</span>
+  <span class="n">theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span><span class="n">lamb</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">unlabeled_data</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Find <code>opt_theta</code> by running the sparse autoencoder on unlabeled
+training images.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">opt_theta</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Visualize weights</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+<span class="n">util</span><span class="o">.</span><span class="n">display_network</span><span class="p">(</span><span class="n">W1</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <h3><span id="step-3:-extract-features-from-the-supervised-dataset" href="step-3:-extract-features-from-the-supervised-dataset"> Step 3: Extract Features from the Supervised Dataset </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">trainFeatures</span> <span class="o">=</span> <span class="n">feedForwardAutoencoder</span><span class="p">(</span><span class="n">opttheta</span><span class="p">,</span> <span class="n">hiddenSize</span><span class="p">,</span> <span class="n">inputSize</span><span class="p">,</span> <span class="o">...</span>
+                                       <span class="n">trainData</span><span class="p">);</span>
+
+<span class="n">testFeatures</span> <span class="o">=</span> <span class="n">feedForwardAutoencoder</span><span class="p">(</span><span class="n">opttheta</span><span class="p">,</span> <span class="n">hiddenSize</span><span class="p">,</span> <span class="n">inputSize</span><span class="p">,</span> <span class="o">...</span>
+                                       <span class="n">testData</span><span class="p">);</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

@@ -35,10 +35,13 @@
 for the Deep Learning class.</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+      <div class="highlight"><pre><span class="n">DISPLAY</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">library.imports</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">autoencoder</span>
 <span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">mnist</span>
 <span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">softmax</span>
 <span class="kn">from</span> <span class="nn">library</span> <span class="kn">import</span> <span class="n">util</span></pre></div>
@@ -102,7 +105,7 @@ images.</p>
       <p>Randomly initialize the parameters</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="n">sae1_theta</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span></pre></div>
+      <div class="highlight"><pre><span class="n">sae1_theta</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-6'>
@@ -129,7 +132,86 @@ size of <code>hidden_size_l1</code>.</p>
     sae1Theta, options);</p>
     </div>
     <div class='code'>
+      <div class="highlight"><pre><span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">sparse_autoencoder_loss</span><span class="p">(</span>
+  <span class="n">theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
+<span class="n">sae1_opt_theta</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sae1_theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">DISPLAY</span><span class="p">:</span>
+  <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">sae1_opt_theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">)</span>
+  <span class="n">util</span><span class="o">.</span><span class="n">display_network</span><span class="p">(</span><span class="n">W1</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <h3><span id="step-3:-train-the-second-sparse-autoencoder" href="step-3:-train-the-second-sparse-autoencoder"> Step 3: Train the second sparse autoencoder </span></h3>
+<p>Train the second sparse autoencoder on the first autoencoder features.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sae1_features</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">feedforward_autoencoder</span><span class="p">(</span><span class="n">sae1_opt_theta</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Randomly initialize the parameters</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sae2_theta</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size_l2</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">)</span>
+
+<span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">sparse_autoencoder_loss</span><span class="p">(</span>
+  <span class="n">theta</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">hidden_size_l2</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">sae1_features</span><span class="p">)</span>
+<span class="n">sae2_opt_theta</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sae2_theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">DISPLAY</span><span class="p">:</span>
+  <span class="n">W11</span><span class="p">,</span> <span class="n">W21</span><span class="p">,</span> <span class="n">b11</span><span class="p">,</span> <span class="n">b21</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">sae1_opt_theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">)</span>
+  <span class="n">W12</span><span class="p">,</span> <span class="n">W22</span><span class="p">,</span> <span class="n">b12</span><span class="p">,</span> <span class="n">b22</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">sae2_opt_theta</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">hidden_size_l2</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>TODO(zellyn): figure out how to display a 2-level network
+display_network(log(W11' ./ (1-W11')) * W12');</p>
+    </div>
+    <div class='code'>
       <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <h3><span id="step-4:-train-the-softmax-classifier" href="step-4:-train-the-softmax-classifier"> Step 4: Train the softmax classifier </span>Train the sparse autoencoder on the second autoencoder features.</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sae2_features</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">feedforward_autoencoder</span><span class="p">(</span><span class="n">sae2_opt_theta</span><span class="p">,</span> <span class="n">hidden_size_l2</span><span class="p">,</span> <span class="n">hidden_size_l1</span><span class="p">,</span> <span class="n">sae1_features</span><span class="p">)</span>
+<span class="n">sae_Softmax_theta</span> <span class="o">=</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">hidden_size_l2</span> <span class="o">*</span> <span class="n">num_Classes</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Train the softmax classifier. The classifier takes in input of
+dimension <code>hidden_size_l2</code> corresponding to the hidden layer size of
+the 2nd layer.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">softmax_model</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">hidden_size_l2</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">sae2_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)</span>
+<span class="n">sae_softmax_opt_theta</span> <span class="o">=</span> <span class="n">softmax_model</span><span class="p">[</span><span class="s">&#39;opt_theta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+
+</pre></div>
     </div>
   </div>
   <div class='clearall'></div>

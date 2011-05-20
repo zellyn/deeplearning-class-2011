@@ -65,7 +65,7 @@ for the Deep Learning class.</p>
 <span class="n">sparsity_param</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="n">lamb</span> <span class="o">=</span> <span class="mf">3e-3</span>
 <span class="n">beta</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">400</span></pre></div>
+<span class="n">maxfun</span> <span class="o">=</span> <span class="mi">400</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-3'>
@@ -164,7 +164,7 @@ training images.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="n">opt_theta</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span>
-  <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span></pre></div>
+  <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">maxfun</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-10'>
@@ -204,7 +204,7 @@ training images.</p>
       <div class="highlight"><pre><span class="n">lamb</span> <span class="o">=</span> <span class="mf">1e-4</span>
 <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">train_labels</span><span class="p">))</span>
 <span class="n">softmax_model</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span>
-                              <span class="n">train_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></pre></div>
+                              <span class="n">train_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-13'>

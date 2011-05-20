@@ -36,13 +36,13 @@
       </div>
       <p>Compute the cost function \(J(\theta)\) and gradient \( \nabla_\theta J(\theta) \).</p>
 <ul>
-<li>theta - flattened (numClasses × inputSize) parameters</li>
-<li>num_classes - the number of classes</li>
-<li>input_size - the size N of the input vector</li>
-<li>lamb - weight decay parameter</li>
-<li>data - the N × M input matrix, where each column data(:, i) corresponds to
+<li><code>theta</code> - flattened (numClasses × inputSize) parameters</li>
+<li><code>num_classes</code> - the number of classes</li>
+<li><code>input_size</code> - the size N of the input vector</li>
+<li><code>lamb</code> - weight decay parameter</li>
+<li><code>data</code> - the N × M input matrix, where each column data(:, i) corresponds to
   a single test set</li>
-<li>labels - an M × 1 matrix containing the labels corresponding for the input data</li>
+<li><code>labels</code> - an M × 1 matrix containing the labels corresponding for the input data</li>
 </ul>
     </div>
     <div class='code'>
@@ -114,23 +114,23 @@ $$</p>
       </div>
       <p>Use <code>cost()</code> to train a network using l-bfgs.</p>
 <ul>
-<li>input_size - the size N of the input vector</li>
-<li>num_classes - the number of classes</li>
-<li>lamb - weight decay parameter</li>
-<li>input_data - the N × M input matrix, where each column data(:, i) corresponds to
+<li><code>input_size</code> - the size N of the input vector</li>
+<li><code>num_classes</code> - the number of classes</li>
+<li><code>lamb</code> - weight decay parameter</li>
+<li><code>input_data</code> - the N × M input matrix, where each column data(:, i) corresponds to
   a single test set</li>
-<li>labels - an M × 1 matrix containing the labels corresponding for the input data</li>
-<li>max_iter - maximum number of iterations for l-bfgs</li>
+<li><code>labels</code> - an M × 1 matrix containing the labels corresponding for the input data</li>
+<li><code>maxfun</code> - maximum number of iterations for l-bfgs</li>
 </ul>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
   <span class="n">theta</span> <span class="o">=</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_classes</span> <span class="o">*</span> <span class="n">input_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
   <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
 
   <span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
-  <span class="n">softmax_opt_theta</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+  <span class="n">softmax_opt_theta</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">maxfun</span><span class="p">,</span> <span class="n">iprint</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
   <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opt_theta</span> <span class="o">=</span> <span class="n">softmax_opt_theta</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">input_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">),</span>
               <span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span><span class="p">,</span>
@@ -145,8 +145,8 @@ $$</p>
       <p>Given a trained model and data, return the prediction matrix
 \( pred_i = \mathop{\arg\!\max}\limits_c \,P(y^{(i)} = c | x^{(i)}) \):</p>
 <ul>
-<li>model - model trained using train()</li>
-<li>input_data - the N × M input matrix, where each column data(:, i)
+<li><code>model</code> - model trained using train()</li>
+<li><code>input_data</code> - the N × M input matrix, where each column data(:, i)
   corresponds to a single test set</li>
 </ul>
     </div>

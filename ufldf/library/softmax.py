@@ -9,13 +9,13 @@ from imports import *
 
 # Compute the cost function \\(J(\\theta)\\) and gradient \\( \\nabla_\\theta J(\\theta) \\).
 #
-# - theta - flattened (numClasses × inputSize) parameters
-# - num_classes - the number of classes
-# - input_size - the size N of the input vector
-# - lamb - weight decay parameter
-# - data - the N × M input matrix, where each column data(:, i) corresponds to
+# - `theta` - flattened (numClasses × inputSize) parameters
+# - `num_classes` - the number of classes
+# - `input_size` - the size N of the input vector
+# - `lamb` - weight decay parameter
+# - `data` - the N × M input matrix, where each column data(:, i) corresponds to
 #   a single test set
-# - labels - an M × 1 matrix containing the labels corresponding for the input data
+# - `labels` - an M × 1 matrix containing the labels corresponding for the input data
 def cost(theta, num_classes, input_size, lamb, data, labels):
   theta = theta.reshape([num_classes, input_size], order='F')
   num_cases = data.shape[1]
@@ -53,20 +53,20 @@ def cost(theta, num_classes, input_size, lamb, data, labels):
 
 # Use `cost()` to train a network using l-bfgs.
 #
-# - input_size - the size N of the input vector
-# - num_classes - the number of classes
-# - lamb - weight decay parameter
-# - input_data - the N × M input matrix, where each column data(:, i) corresponds to
+# - `input_size` - the size N of the input vector
+# - `num_classes` - the number of classes
+# - `lamb` - weight decay parameter
+# - `input_data` - the N × M input matrix, where each column data(:, i) corresponds to
 #   a single test set
-# - labels - an M × 1 matrix containing the labels corresponding for the input data
-# - max_iter - maximum number of iterations for l-bfgs
-def train(input_size, num_classes, lamb, input_data, labels, max_iter=400):
+# - `labels` - an M × 1 matrix containing the labels corresponding for the input data
+# - `maxfun` - maximum number of iterations for l-bfgs
+def train(input_size, num_classes, lamb, input_data, labels, maxfun=400):
   theta = 0.005 * np.random.randn(num_classes * input_size, 1)
   theta = np.asfortranarray(theta)
 
   fn = lambda theta: cost(theta, num_classes, input_size, lamb, input_data, labels)
 
-  softmax_opt_theta, f, d = scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=max_iter, iprint=25, m=20)
+  softmax_opt_theta, f, d = scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=maxfun, iprint=25, m=20)
 
   return dict(opt_theta = softmax_opt_theta.reshape([num_classes, input_size], order='F'),
               input_size = input_size,
@@ -75,8 +75,8 @@ def train(input_size, num_classes, lamb, input_data, labels, max_iter=400):
 # Given a trained model and data, return the prediction matrix
 # \\( pred_i = \\mathop{\\arg\\!\\max}\\limits_c \\,P(y^{(i)} = c | x^{(i)}) \\):
 #
-# - model - model trained using train()
-# - input_data - the N × M input matrix, where each column data(:, i)
+# - `model` - model trained using train()
+# - `input_data` - the N × M input matrix, where each column data(:, i)
 #   corresponds to a single test set
 def predict(model, input_data):
   theta = model['opt_theta']

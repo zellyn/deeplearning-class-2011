@@ -29,7 +29,7 @@ hidden_size = 200
 sparsity_param = 0.1
 lamb = 3e-3
 beta = 3
-max_iter = 400
+maxfun = 400
 
 # === Step 1: Load data ===
 #
@@ -74,7 +74,7 @@ fn = lambda theta: autoencoder.sparse_autoencoder_loss(
 # Find `opt_theta` by running the sparse autoencoder on unlabeled
 # training images.
 opt_theta, loss, d = (
-  scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=max_iter, iprint=1, m=20))
+  scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=maxfun, iprint=1, m=20))
 
 # Visualize weights
 W1, W2, b1, b2 = autoencoder.unflatten(opt_theta, input_size, hidden_size)
@@ -90,7 +90,7 @@ test_features = autoencoder.feedforward_autoencoder(
 lamb = 1e-4
 num_classes = len(set(train_labels))
 softmax_model = softmax.train(hidden_size, num_classes, lamb,
-                              train_features, train_labels, max_iter=100)
+                              train_features, train_labels, maxfun=100)
 
 # === Step 5: Testing ===
 #

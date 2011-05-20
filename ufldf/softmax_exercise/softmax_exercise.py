@@ -86,7 +86,7 @@ if False:
 #  [softmax.train()](softmax.html#section-5).
 
 softmax_model = softmax.train(input_size, num_classes, lamb,
-                              input_data, labels, max_iter=100)
+                              input_data, labels, maxfun=100)
 
 # === Step 5: Testing ===
 #

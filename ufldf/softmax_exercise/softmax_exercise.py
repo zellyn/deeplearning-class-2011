@@ -9,7 +9,6 @@
 # exercise](http://ufldl.stanford.edu/wiki/index.php/Exercise:Softmax_Regression)
 # for the Deep Learning class.
 
-import time
 import sys
 sys.path.append('..')
 from library.imports import *

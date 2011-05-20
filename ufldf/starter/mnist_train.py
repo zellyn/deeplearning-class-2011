@@ -20,11 +20,11 @@ def main(testing=True):
   patches = images[:,0:10000]
   theta = util.initialize_parameters(hidden_size, visible_size)
   def sal(theta):
-    return sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
-                                   sparsity_param, beta, patches)
+    return util.sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
+                                        sparsity_param, beta, patches)
   x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=1, m=20)
-  W1, W2, b1, b2 = unflatten(x, visible_size, hidden_size)
-  display_network(W1.T)
+  W1, W2, b1, b2 = util.unflatten(x, visible_size, hidden_size)
+  util.display_network(W1.T)
 
 if __name__ == '__main__':
   main(testing=False)

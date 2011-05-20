@@ -95,3 +95,37 @@ def display_network(arr, title=None, show=True):
   plt.imshow(array, interpolation='nearest', cmap=plt.cm.gray)
   if show:
     plt.show()
+
+def sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
+                            target_activation, beta, data):
+  m = data.shape[1]
+
+  W1, W2, b1, b2 = unflatten(theta, visible_size, hidden_size)
+
+  z2 = W1.dot(data) + b1
+  a2 = sigmoid(z2)
+  z3 = W2.dot(a2) + b2
+  a3 = sigmoid(z3)
+
+  rhohats = np.mean(a2,1)[:, np.newaxis]
+  rho = target_activation
+  KLsum = np.sum(rho * np.log(rho / rhohats) + (1-rho) * np.log((1-rho) / (1-rhohats)))
+
+  squares = (a3 - data) ** 2
+  squared_err_J = 0.5 * (1.0/m) * np.sum(squares)
+  weight_decay_J = (lamb/2.0) * (np.sum(W1**2) + np.sum(W2**2))
+  sparsity_J = beta * KLsum
+  loss = squared_err_J + weight_decay_J + sparsity_J
+
+  delta3 = -(data - a3) * a3 * (1-a3)
+  beta_term = beta * (-rho / rhohats + (1-rho) / (1-rhohats))
+  delta2 = (W2.T.dot(delta3) + beta_term) * a2 * (1-a2)
+
+  W2grad = (1.0/m) * delta3.dot(a2.T) + lamb * W2
+  b2grad = (1.0/m) * np.sum(delta3, 1)[:, np.newaxis]
+  W1grad = (1.0/m) * delta2.dot(data.T) + lamb * W1
+  b1grad = (1.0/m) * np.sum(delta2, 1)[:, np.newaxis]
+
+  grad = flatten(W1grad, W2grad, b1grad, b2grad)
+
+  return (loss, grad)

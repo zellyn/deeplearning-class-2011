@@ -1,17 +1,9 @@
 #! /Users/zellyn/.ve/np/bin/python
 
-import time
 import sys
-import numpy as np
-import scipy as sp
-import matplotlib as mpl
-if sys.platform == 'darwin': mpl.use('TkAgg')
-
-import matplotlib.pyplot as plt
-from scipy import linalg
-from mpl_toolkits.mplot3d import Axes3D
-import scipy.io as sio
-import scipy.optimize
+sys.path.append('..')
+from library.imports import *
+from library import util
 
 def sample_IMAGES_RAW():
   IMAGES = sio.loadmat('IMAGES_RAW.mat')['IMAGESr']
@@ -30,45 +22,11 @@ def sample_IMAGES_RAW():
       p = p + 1
   return patches
 
-def display_network(arr, title, show=True):
-  arr = arr - np.mean(arr)
-  L, M = arr.shape
-  sz = np.sqrt(L)
-  buf = 1
-
-  # Figure out pleasant grid dimensions
-  if M == np.floor(np.sqrt(M))**2:
-    n = m = np.sqrt(M)
-  else:
-    n = np.ceil(np.sqrt(M))
-    while (M%n) and n < 1.2*np.sqrt(M):
-      n += 1
-    m = np.ceil(M/n)
-
-  array = np.zeros([buf+m*(sz+buf), buf+n*(sz+buf)])
-
-  k = 0
-  for i in range(0, int(m)):
-    for j in range(0, int(n)):
-      if k>=M:
-        continue
-      cmax = np.max(arr[:,k])
-      cmin = np.min(arr[:,k])
-      r = buf+i*(sz+buf)
-      c = buf+j*(sz+buf)
-      array[r:r+sz, c:c+sz] = (arr[:,k].reshape([sz,sz], order='F') - cmin) / (cmax-cmin)
-      k = k + 1
-  plt.figure()
-  plt.title(title)
-  plt.imshow(array, interpolation='nearest', cmap=plt.cm.gray)
-  if show:
-    plt.show()
-
 # STEP 0a: Load data
 x = sample_IMAGES_RAW()
 m, n = x.shape
 randsel = np.random.randint(0, n, 200)
-# display_network(x[:, randsel], 'Raw data')
+# util.display_network(x[:, randsel], 'Raw data')
 
 # STEP 0b: Zero-mean the data (by column)
 avg = np.mean(x, 0)[np.newaxis, :]
@@ -97,8 +55,8 @@ k = SD[(np.cumsum(SD) / np.sum(SD)) < 0.99].size
 xRot = U[:,0:k].T.dot(x)
 xHat = U[:,0:k].dot(xRot)
 
-display_network(x[:, randsel], 'Raw images', show=False)
-display_network(xHat[:, randsel], 'PCA processed images')
+util.display_network(x[:, randsel], 'Raw images', show=False)
+util.display_network(xHat[:, randsel], 'PCA processed images')
 
 # STEP 4a: Implement PCA with whitening and regularisation
 
@@ -118,5 +76,5 @@ plt.show()
 
 xZCAWhite = U.dot(xPCAWhite)
 
-display_network(x[:, randsel], 'Raw images', show=False)
-display_network(xZCAWhite[:, randsel], 'ZCA whitened images')
+util.display_network(x[:, randsel], 'Raw images', show=False)
+util.display_network(xZCAWhite[:, randsel], 'ZCA whitened images')

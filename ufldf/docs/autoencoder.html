@@ -152,7 +152,27 @@ single-hidden-layer autoencoder.</p>
 
   <span class="n">grad</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">W1grad</span><span class="p">,</span> <span class="n">W2grad</span><span class="p">,</span> <span class="n">b1grad</span><span class="p">,</span> <span class="n">b2grad</span><span class="p">)</span>
 
-  <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Compute the output of the hidden layer for a trained autoencoder.</p>
+<ul>
+<li><code>theta</code> - trained weights from the autoencoder</li>
+<li><code>visible_size</code> - the number of input units</li>
+<li><code>hidden_size</code> the number of hidden units</li>
+<li><code>data</code> - matrix containing the training data as columns. So,
+  <code>data(:,i)</code> is the i-th training example.</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">feedforward_autoencoder</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">unflatten</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">W1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
 
 </pre></div>
     </div>

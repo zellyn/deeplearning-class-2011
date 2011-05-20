@@ -29,7 +29,7 @@ hidden_size = 200
 sparsity_param = 0.1
 lamb = 3e-3
 beta = 3
-max_iter = 4  # 400
+max_iter = 400
 
 # === Step 1: Load data ===
 #
@@ -77,12 +77,25 @@ opt_theta, loss, d = (
   scipy.optimize.fmin_l_bfgs_b(fn, theta, maxfun=max_iter, iprint=1, m=20))
 
 # Visualize weights
-W1, W2, b1, b2 = autoencoder.unflatten(x, input_size, hidden_size)
+W1, W2, b1, b2 = autoencoder.unflatten(opt_theta, input_size, hidden_size)
 util.display_network(W1.T)
 
 # === Step 3: Extract Features from the Supervised Dataset ===
-trainFeatures = feedForwardAutoencoder(opttheta, hiddenSize, inputSize, ...
-                                       trainData);
+train_features = autoencoder.feedforward_autoencoder(
+  opt_theta, hidden_size, input_size, train_data)
+test_features = autoencoder.feedforward_autoencoder(
+  opt_theta, hidden_size, input_size, test_data)
 
-testFeatures = feedForwardAutoencoder(opttheta, hiddenSize, inputSize, ...
-                                       testData);
+# === Step 4: Train the softmax classifier ===
+lamb = 1e-4
+num_classes = len(set(train_labels))
+softmax_model = softmax.train(hidden_size, num_classes, lamb,
+                              train_features, train_labels, max_iter=100)
+
+# === Step 5: Testing ===
+#
+# Compute Predictions on the test set (testFeatures) using
+# `softmax.predict`.
+pred = softmax.predict(softmax_model, test_features)
+acc = (test_labels == pred).mean()
+print 'Accuracy: %0.3f' % (acc * 100)

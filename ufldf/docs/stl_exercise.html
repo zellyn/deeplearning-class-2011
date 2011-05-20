@@ -65,7 +65,7 @@ for the Deep Learning class.</p>
 <span class="n">sparsity_param</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="n">lamb</span> <span class="o">=</span> <span class="mf">3e-3</span>
 <span class="n">beta</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c"># 400</span></pre></div>
+<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">400</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div><div class='section' id='section-3'>
@@ -175,7 +175,7 @@ training images.</p>
       <p>Visualize weights</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+      <div class="highlight"><pre><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">opt_theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
 <span class="n">util</span><span class="o">.</span><span class="n">display_network</span><span class="p">(</span><span class="n">W1</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></pre></div>
     </div>
   </div>
@@ -187,11 +187,39 @@ training images.</p>
       <h3><span id="step-3:-extract-features-from-the-supervised-dataset" href="step-3:-extract-features-from-the-supervised-dataset"> Step 3: Extract Features from the Supervised Dataset </span></h3>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="n">trainFeatures</span> <span class="o">=</span> <span class="n">feedForwardAutoencoder</span><span class="p">(</span><span class="n">opttheta</span><span class="p">,</span> <span class="n">hiddenSize</span><span class="p">,</span> <span class="n">inputSize</span><span class="p">,</span> <span class="o">...</span>
-                                       <span class="n">trainData</span><span class="p">);</span>
-
-<span class="n">testFeatures</span> <span class="o">=</span> <span class="n">feedForwardAutoencoder</span><span class="p">(</span><span class="n">opttheta</span><span class="p">,</span> <span class="n">hiddenSize</span><span class="p">,</span> <span class="n">inputSize</span><span class="p">,</span> <span class="o">...</span>
-                                       <span class="n">testData</span><span class="p">);</span>
+      <div class="highlight"><pre><span class="n">train_features</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">feedforward_autoencoder</span><span class="p">(</span>
+  <span class="n">opt_theta</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
+<span class="n">test_features</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="o">.</span><span class="n">feedforward_autoencoder</span><span class="p">(</span>
+  <span class="n">opt_theta</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <h3><span id="step-4:-train-the-softmax-classifier" href="step-4:-train-the-softmax-classifier"> Step 4: Train the softmax classifier </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">lamb</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">train_labels</span><span class="p">))</span>
+<span class="n">softmax_model</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span>
+                              <span class="n">train_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <h3><span id="step-5:-testing" href="step-5:-testing"> Step 5: Testing </span></h3>
+<p>Compute Predictions on the test set (testFeatures) using
+<code>softmax.predict</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">pred</span> <span class="o">=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">softmax_model</span><span class="p">,</span> <span class="n">test_features</span><span class="p">)</span>
+<span class="n">acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">test_labels</span> <span class="o">==</span> <span class="n">pred</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;Accuracy: </span><span class="si">%0.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">acc</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
 
 </pre></div>
     </div>

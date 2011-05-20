@@ -82,3 +82,14 @@ def sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
   grad = flatten(W1grad, W2grad, b1grad, b2grad)
 
   return (loss, grad)
+
+# Compute the output of the hidden layer for a trained autoencoder.
+#
+# - `theta` - trained weights from the autoencoder
+# - `visible_size` - the number of input units
+# - `hidden_size` the number of hidden units
+# - `data` - matrix containing the training data as columns. So,
+#   `data(:,i)` is the i-th training example.
+def feedforward_autoencoder(theta, hidden_size, visible_size, data):
+  W1, W2, b1, b2 = unflatten(theta, visible_size, hidden_size)
+  return sigmoid(W1.dot(data) + b1)

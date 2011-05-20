@@ -70,69 +70,6 @@ input, numerically.</p>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-3'>#</a>
       </div>
-      <p>Flatten W1, W2, b1, b2 into a row vector</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">W1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">W2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">b1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">b2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">)]),</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div><div class='section' id='section-4'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-4'>#</a>
-      </div>
-      <p>Expand a row vector back into W1, W2, b1, b2</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">unflatten</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
-  <span class="n">hv</span> <span class="o">=</span> <span class="n">hidden_size</span> <span class="o">*</span> <span class="n">visible_size</span>
-  <span class="n">W1</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">hv</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
-  <span class="n">W2</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">hv</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
-  <span class="n">b1</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="o">+</span><span class="n">hidden_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
-  <span class="n">b2</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="o">+</span><span class="n">hidden_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
-  <span class="k">return</span> <span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div><div class='section' id='section-5'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-5'>#</a>
-      </div>
-      <p>Initialize a single-layer autoencoder</p>
-<ul>
-<li><code>hidden_size</code> - the number of hidden units</li>
-<li><code>visible_size</code> - the size of the input (and output)</li>
-</ul>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">):</span>
-  <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">visible_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="n">W1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span>
-  <span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span>
-  <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-  <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-
-  <span class="k">return</span> <span class="n">flatten</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div><div class='section' id='section-6'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-6'>#</a>
-      </div>
-      <p>The sigmoid function, \( \frac{1}{1 + e^{-x}} \).</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-  <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div><div class='section' id='section-7'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-7'>#</a>
-      </div>
       <p>Display a network or array.</p>
 <ul>
 <li><code>arr</code> - the data, one entry per column</li>
@@ -148,10 +85,10 @@ input, numerically.</p>
   <span class="n">buf</span> <span class="o">=</span> <span class="mi">1</span></pre></div>
     </div>
   </div>
-  <div class='clearall'></div><div class='section' id='section-8'>
+  <div class='clearall'></div><div class='section' id='section-4'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-8'>#</a>
+        <a class='octothorpe' href='#section-4'>#</a>
       </div>
       <p>Figure out pleasant grid dimensions</p>
     </div>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>autoencoder.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>autoencoder.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Various autoencoder-related routines for the Deep Learning
+exercises.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">library.imports</span> <span class="kn">import</span> <span class="o">*</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Flatten W1, W2, b1, b2 into a row vector</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">W1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">W2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">b1</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">b2</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">)]),</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Expand a row vector back into W1, W2, b1, b2</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">unflatten</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
+  <span class="n">hv</span> <span class="o">=</span> <span class="n">hidden_size</span> <span class="o">*</span> <span class="n">visible_size</span>
+  <span class="n">W1</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">hv</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">W2</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="n">hv</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">b1</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="o">+</span><span class="n">hidden_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">b2</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">hv</span><span class="o">+</span><span class="n">hidden_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Initialize a single-layer autoencoder</p>
+<ul>
+<li><code>hidden_size</code> - the number of hidden units</li>
+<li><code>visible_size</code> - the size of the input (and output)</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">initialize_parameters</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">):</span>
+  <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">visible_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">W1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span>
+  <span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">r</span><span class="p">;</span>
+  <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+  <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">visible_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+  <span class="k">return</span> <span class="n">flatten</span><span class="p">(</span><span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>The sigmoid function, \( \frac{1}{1 + e^{-x}} \).</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Compute sparse autoencoder loss and gradient for a
+single-hidden-layer autoencoder.</p>
+<ul>
+<li><code>theta</code> - position at which to compute loss and gradient</li>
+<li><code>visible_size</code> - size of input and output layers</li>
+<li><code>hidden_size</code> - size of the hidden layer</li>
+<li><code>lamb</code> - weight decay parameter</li>
+<li><code>target_activation</code> - desired average activation of the hidden
+  units (\(\rho\) in the lecture notes)</li>
+<li><code>beta</code> - weight of sparsity penalty term</li>
+<li><code>data</code> - the input data</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">sparse_autoencoder_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span>
+                            <span class="n">target_activation</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="n">m</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+  <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">unflatten</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">visible_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+
+  <span class="n">z2</span> <span class="o">=</span> <span class="n">W1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span>
+  <span class="n">a2</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+  <span class="n">z3</span> <span class="o">=</span> <span class="n">W2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span>
+  <span class="n">a3</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">z3</span><span class="p">)</span>
+
+  <span class="n">rhohats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+  <span class="n">rho</span> <span class="o">=</span> <span class="n">target_activation</span>
+  <span class="n">KLsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rho</span> <span class="o">/</span> <span class="n">rhohats</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rho</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">rho</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rhohats</span><span class="p">)))</span>
+
+  <span class="n">squares</span> <span class="o">=</span> <span class="p">(</span><span class="n">a3</span> <span class="o">-</span> <span class="n">data</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+  <span class="n">squared_err_J</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">squares</span><span class="p">)</span>
+  <span class="n">weight_decay_J</span> <span class="o">=</span> <span class="p">(</span><span class="n">lamb</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W2</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+  <span class="n">sparsity_J</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">KLsum</span>
+  <span class="n">loss</span> <span class="o">=</span> <span class="n">squared_err_J</span> <span class="o">+</span> <span class="n">weight_decay_J</span> <span class="o">+</span> <span class="n">sparsity_J</span>
+
+  <span class="n">delta3</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">a3</span><span class="p">)</span> <span class="o">*</span> <span class="n">a3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a3</span><span class="p">)</span>
+  <span class="n">beta_term</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">rho</span> <span class="o">/</span> <span class="n">rhohats</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rho</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rhohats</span><span class="p">))</span>
+  <span class="n">delta2</span> <span class="o">=</span> <span class="p">(</span><span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">delta3</span><span class="p">)</span> <span class="o">+</span> <span class="n">beta_term</span><span class="p">)</span> <span class="o">*</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a2</span><span class="p">)</span>
+
+  <span class="n">W2grad</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta3</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">lamb</span> <span class="o">*</span> <span class="n">W2</span>
+  <span class="n">b2grad</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">delta3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+  <span class="n">W1grad</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">lamb</span> <span class="o">*</span> <span class="n">W1</span>
+  <span class="n">b1grad</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">delta2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+  <span class="n">grad</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">W1grad</span><span class="p">,</span> <span class="n">W2grad</span><span class="p">,</span> <span class="n">b1grad</span><span class="p">,</span> <span class="n">b2grad</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

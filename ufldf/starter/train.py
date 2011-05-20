@@ -6,6 +6,7 @@ import sys
 sys.path.append('..')
 from library.imports import *
 from library import util
+from library import autoencoder
 
 def normalize_data(data):
   data = data - np.mean(data)
@@ -43,13 +44,13 @@ def main(testing=False):
 
   patches = sampleIMAGES(patchsize, num_patches)
   util.display_network(patches[:,np.random.randint(0, num_patches, 200)])
-  theta = util.initialize_parameters(hidden_size, visible_size)
+  theta = autoencoder.initialize_parameters(hidden_size, visible_size)
 
   # STEP 2: Implement sparseAutoencoderLoss
 
   def sal(theta):
-    return util.sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
-                                        target_activation, beta, patches)
+    return autoencoder.sparse_autoencoder_loss(theta, visible_size, hidden_size, lamb,
+                                               target_activation, beta, patches)
 
   loss, grad = sal(theta)
 
@@ -67,7 +68,7 @@ def main(testing=False):
   # STEP 4: Run sparse_autoencoder_loss with L-BFGS
 
   # Initialize random theta
-  theta = util.initialize_parameters(hidden_size, visible_size)
+  theta = autoencoder.initialize_parameters(hidden_size, visible_size)
 
   print "Starting..."
   x, f, d = scipy.optimize.fmin_l_bfgs_b(sal, theta, maxfun=400, iprint=25, m=20)
@@ -76,7 +77,7 @@ def main(testing=False):
   print f
   print d
 
-  W1, W2, b1, b2 = util.unflatten(x, visible_size, hidden_size)
+  W1, W2, b1, b2 = autoencoder.unflatten(x, visible_size, hidden_size)
   print "W1.shape=%s" % (W1.shape,)
   util.display_network(W1.T)
 
@@ -107,7 +108,7 @@ def test_loss():
       [-0.7],
       [0.6]])
 
-  theta = util.flatten(W1,W2,b1,b2)
+  theta = autoencoder.flatten(W1,W2,b1,b2)
 
   data = np.array([
       [0.2, -0.7,  0.8, -0.1, -0.8],

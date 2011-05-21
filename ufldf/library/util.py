@@ -7,6 +7,10 @@
 
 from library.imports import *
 
+# An empty class for sticking attributes onto
+class Empty(object):
+  pass
+
 # Given a function and a function input, compute the gradient at that
 # input, numerically.
 #

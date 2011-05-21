@@ -27,6 +27,261 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="kn">from</span> <span class="nn">imports</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">util</span>
+<span class="kn">import</span> <span class="nn">autoencoder</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Convert a "stack" structure into a flattened parameter vector and
+also store the network configuration. This is useful when working
+with optimization toolboxes.</p>
+<p><code>params, netconfig = stack2params(stack)</code></p>
+<p><code>stack</code> - the stack structure, where:</p>
+<ul>
+<li><code>stack[1].w</code> = weights of first layer</li>
+<li><code>stack[1].b</code> = weights of first layer</li>
+<li><code>stack[2].w</code> = weights of second layer</li>
+<li><code>stack[2].b</code> = weights of second layer</li>
+<li>... etc.</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">stack2params</span><span class="p">(</span><span class="n">stack</span><span class="p">):</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">netconfig</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Empty</span><span class="p">()</span>
+  <span class="n">netconfig</span><span class="o">.</span><span class="n">layersizes</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">netconfig</span><span class="o">.</span><span class="n">inputsize</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">if</span> <span class="n">stack</span><span class="p">:</span>
+    <span class="n">netconfig</span><span class="o">.</span><span class="n">inputsize</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">stack</span><span class="p">:</span>
+      <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">params</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">entry</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)])</span>
+      <span class="n">netconfig</span><span class="o">.</span><span class="n">layersizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+  <span class="k">return</span> <span class="n">params</span><span class="p">,</span> <span class="n">netconfig</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Convert a flattened parameter vector into a nice "stack" structure
+for us to work with. This is seful when building multilayer
+networks.</p>
+<p><code>stack = params2stack(params, netconfig)</code></p>
+<ul>
+<li><code>params</code> - flattened parameter vector</li>
+<li><code>netconfig</code> - auxiliary variable containing the configuration of
+  the network</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">params2stack</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">netconfig</span><span class="p">):</span>
+  <span class="n">depth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">netconfig</span><span class="o">.</span><span class="n">layersizes</span><span class="p">)</span>
+  <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">prev_layersize</span> <span class="o">=</span> <span class="n">netconfig</span><span class="o">.</span><span class="n">inputsize</span>
+  <span class="n">cur_pos</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">Empty</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Extract weights</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">layersize</span> <span class="o">=</span> <span class="n">netconfig</span><span class="o">.</span><span class="n">layersizes</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="n">wlen</span> <span class="o">=</span> <span class="n">layersize</span> <span class="o">*</span> <span class="n">prev_layersize</span>
+    <span class="n">entry</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">cur_pos</span><span class="p">:</span><span class="n">cur_pos</span> <span class="o">+</span> <span class="n">wlen</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">layersize</span><span class="p">,</span> <span class="n">prev_layersize</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+    <span class="n">cur_pos</span> <span class="o">+=</span> <span class="n">wlen</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Extract bias</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">blen</span> <span class="o">=</span> <span class="n">layersize</span>
+    <span class="n">entry</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">cur_pos</span><span class="p">:</span><span class="n">cur_pos</span> <span class="o">+</span> <span class="n">blen</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">layersize</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+    <span class="n">cur_pos</span> <span class="o">+=</span> <span class="n">blen</span>
+
+    <span class="n">prev_layersize</span> <span class="o">=</span> <span class="n">layersize</span>
+    <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">stack</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Take a trained (autoencoder network and softmax) theta, and a
+training data set with labels, and return cost and gradient using a
+stacked autoencoder model. Used for finetuning.</p>
+<ul>
+<li><code>theta</code> - trained weights from the autoencoder</li>
+<li><code>hidden_size</code> - the number of hidden units <em>at the last layer</em></li>
+<li><code>num_classes</code> -  the number of categories</li>
+<li><code>netconfig</code> - the network configuration of the stack</li>
+<li><code>lamb</code> - the weight regularization penalty</li>
+<li><code>data</code> - Our matrix containing the training data as columns.  So,
+  <code>data[:,i]</code> is the i-th training example.</li>
+<li><code>labels</code> - A vector containing labels, where <code>labels[i]</code> is the
+  label for the i-th training example</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">netconfig</span><span class="p">,</span> <span class="n">lamb</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>We first extract the part which compute the softmax gradient</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">softmax_theta</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[:</span><span class="n">hidden_size</span> <span class="o">*</span> <span class="n">num_classes</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Extract out the "stack"</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">stack</span> <span class="o">=</span> <span class="n">params2stack</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">hiddenSize</span> <span class="o">*</span> <span class="n">numClasses</span><span class="p">:],</span> <span class="n">netconfig</span><span class="p">)</span>
+
+  <span class="n">stack_grad</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">num_cases</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_cases</span><span class="p">])</span>
+  <span class="n">ground_truth</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_cases</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Compute the cost function and gradient vector for the stacked
+autoencoder.</p>
+<p><code>stack</code> is a cell-array of the weights and biases for every
+layer. In particular, the weights of layer d are <code>stack[d].w</code> and
+the biases are <code>stack[d].b</code>.</p>
+<p>The last layer of the network is connected to the softmax
+classification layer, <code>softmax_theta</code>.</p>
+<p>Compute the gradients for the softmax_theta, storing that in
+<code>softmax_theta_grad</code>. Similarly, compute the gradients for each
+layer in the stack, storing the gradients in <code>stack_grad[d].w</code> and
+<code>stack_grad[d].b</code>.  Note that the size of the matrices in stackgrad
+should match exactly that of the size of the matrices in stack.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">depth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+  <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+    <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="n">later</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span> <span class="o">+</span> <span class="n">stack</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">autoencoder</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+
+  <span class="n">M</span> <span class="o">=</span> <span class="n">softmax_theta</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">depth</span><span class="p">])</span>
+  <span class="n">M</span> <span class="o">=</span> <span class="n">M</span> <span class="o">-</span> <span class="n">M</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+  <span class="n">gt_vec</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">p_vec</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+  <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span> <span class="o">*</span> <span class="n">gt_vec</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_vec</span><span class="p">))</span> <span class="o">+</span> <span class="n">lamb</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">softmax_theta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+  <span class="n">theta_grad</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span> <span class="o">*</span> <span class="p">(</span><span class="n">ground_truth</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">lamb</span> <span class="o">*</span> <span class="n">softmax_theta</span>
+
+  <span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+  <span class="n">d</span><span class="p">[</span><span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">softmax_theta</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">groundTruth</span> <span class="o">-</span> <span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">depth</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="n">depth</span><span class="p">])</span>
+
+  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span>
+
+  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">stack_grad</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">stack_grad</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">num_cases</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+  <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">softmax_theta_grad</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">),</span> <span class="n">stack2params</span><span class="p">(</span><span class="n">stack_grad</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+
+  <span class="k">return</span> <span class="n">cost</span><span class="p">,</span> <span class="n">grad</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Take a trained theta and a test data set, and return the predicted
+labels for each example.</p>
+<ul>
+<li><code>theta</code> - trained weights from the autoencoder</li>
+<li><code>visibleSize</code> - the number of input units</li>
+<li><code>hiddenSize</code> - the number of hidden units <em>at the 2nd layer</em></li>
+<li><code>numClasses</code> - the number of categories</li>
+<li><code>data</code> - matrix containing the training data as columns.  So,
+  <code>data[:,i]</code> is the i-th training example.</li>
+</ul>
+<p>returns the prediction matrix
+\( pred_i = \mathop{\arg\!\max}\limits_c \,P(y^{(i)} = c | x^{(i)}) \).</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">netconfig</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>We first extract the part which compute the softmax gradient</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">softmax_theta</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[:</span><span class="n">hidden_size</span> <span class="o">*</span> <span class="n">num_classes</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;F&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Extract out the "stack"</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="n">stack</span> <span class="o">=</span> <span class="n">params2stack</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">hiddenSize</span> <span class="o">*</span> <span class="n">numClasses</span><span class="p">:],</span> <span class="n">netconfig</span><span class="p">)</span>
+
+  <span class="n">stack_grad</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">num_cases</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_cases</span><span class="p">])</span>
+  <span class="n">ground_truth</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_cases</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+
+  <span class="n">depth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+  <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+    <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="n">later</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span> <span class="o">+</span> <span class="n">stack</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">autoencoder</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">layer</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+
+  <span class="k">return</span> <span class="n">softmax_theta</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">depth</span><span class="p">])</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 </pre></div>
     </div>

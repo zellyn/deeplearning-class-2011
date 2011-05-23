@@ -35,7 +35,7 @@ poolDim = 16;          % dimension of pooling region
 %  load the preprocessing matrices for later use in convolution.
 
 % Change the path if necessary
-data = load('STL10Features.mat');
+data = load('../linear_decoder_exercise/STL10Features.mat');
 optTheta = data.optTheta;
 ZCAWhite = data.ZCAWhite;
 meanPatch = data.meanPatch;

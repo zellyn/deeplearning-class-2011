@@ -1,14 +1,15 @@
-addpath ../../vectorization/soln/
-
 %% CS294A/CS294W Linear Decoder Exercise
 
 %  Instructions
 %  ------------
-% 
+%
 %  This file contains code that helps you get started on the
 %  linear decoder exericse. For this exercise, you will only need to modify
 %  the code in sparseAutoencoderLinearCost.m. You will not need to modify
 %  any code in this file.
+
+addpath '../library/'
+addpath '../library/minFunc/'
 
 %%======================================================================
 %% STEP 0: Initialization
@@ -19,24 +20,24 @@ imageChannels = 3;     % number of channels (rgb, so 3)
 patchDim = 8;          % patch dimension
 numPatches = 100000;   % number of patches
 
-visibleSize = patchDim * patchDim * imageChannels;  % number of input units 
+visibleSize = patchDim * patchDim * imageChannels;  % number of input units
 outputSize = visibleSize;   % number of output units
-hiddenSize = 400;           % number of hidden units 
+hiddenSize = 400;           % number of hidden units
 
 sparsityParam = 0.035; % desired average activation of the hidden units.
-lambda = 3e-3;         % weight decay parameter       
-beta = 5;              % weight of sparsity penalty term       
+lambda = 3e-3;         % weight decay parameter
+beta = 5;              % weight of sparsity penalty term
 
 epsilon = 0.1;	       % epsilon for ZCA whitening
 
 %%======================================================================
 %% STEP 1: Create and modify sparseAutoencoderLinearCost.m to use a linear decoder,
 %          and check gradients
-%  You should copy sparseAutoencoderCost.m from your earlier exercise 
-%  and rename it to sparseAutoencoderLinearCost.m. 
+%  You should copy sparseAutoencoderCost.m from your earlier exercise
+%  and rename it to sparseAutoencoderLinearCost.m.
 %  Then you need to rename the function from sparseAutoencoderCost to
 %  sparseAutoencoderLinearCost, and modify it so that the sparse autoencoder
-%  uses a linear decoder instead. Once that is done, you should check 
+%  uses a linear decoder instead. Once that is done, you should check
 % your gradients to verify that they are correct.
 
 % NOTE: Modify sparseAutoencoderCost first!
@@ -46,7 +47,7 @@ epsilon = 0.1;	       % epsilon for ZCA whitening
 hiddenSize = 5;
 visibleSize = 8;
 patches = rand([8 10]);
-theta = initializeParameters(hiddenSize, visibleSize); 
+theta = initializeParameters(hiddenSize, visibleSize);
 
 [cost, grad] = sparseAutoencoderLinearCost(theta, visibleSize, hiddenSize, ...
                                            lambda, sparsityParam, beta, ...
@@ -58,11 +59,11 @@ numGrad = computeNumericalGradient( @(x) sparseAutoencoderLinearCost(x, visibleS
                                                   patches), theta);
 
 % Use this to visually compare the gradients side by side
-disp([numGrad grad]); 
+disp([numGrad grad]);
 
 diff = norm(numGrad-grad)/norm(numGrad+grad);
 % Should be small. In our implementation, these values are usually less than 1e-9.
-disp(diff); 
+disp(diff);
 
 assert(diff < 1e-9, 'Difference too large. Check your gradient computation again');
 
@@ -72,7 +73,7 @@ assert(diff < 1e-9, 'Difference too large. Check your gradient computation again
 
 %%======================================================================
 %% STEP 2: Learn features on small patches
-%  In this step, you will use your sparse autoencoder (which now uses a 
+%  In this step, you will use your sparse autoencoder (which now uses a
 %  linear decoder) to learn features on small patches sampled from related
 %  images.
 
@@ -80,27 +81,27 @@ assert(diff < 1e-9, 'Difference too large. Check your gradient computation again
 %  In this step, we load 100k patches sampled from the STL10 dataset and
 %  visualize them.
 
-patches = load('STL10Patches100k.mat');
+patches = load('../data/STL10Patches100k.mat');
 patches = patches.patches;
 
 displayColorNetwork(patches(:, 1:100));
 
 
 %% STEP 2b: Apply preprocessing
-%  In this sub-step, we preprocess the sampled patches, in particular, 
-%  ZCA whitening them. 
-% 
-%  In a later exercise on convolution and pooling, you will need to replicate 
-%  exactly the preprocessing steps you apply to these patches before 
+%  In this sub-step, we preprocess the sampled patches, in particular,
+%  ZCA whitening them.
+%
+%  In a later exercise on convolution and pooling, you will need to replicate
+%  exactly the preprocessing steps you apply to these patches before
 %  using the autoencoder to learn features on them. Hence, we will save the
 %  ZCA whitening and mean image matrices together with the learned features
 %  later on.
 
 % Scale data to range [0, 1]
-patches = patches / 255;       
+patches = patches / 255;
 
 % Subtract mean patch (hence zeroing the mean of the patches)
-meanPatch = mean(patches, 2);  
+meanPatch = mean(patches, 2);
 patches = bsxfun(@minus, patches, meanPatch);
 
 % Apply ZCA whitening
@@ -118,10 +119,9 @@ displayColorNetwork(patches(:, 1:100));
 theta = initializeParameters(hiddenSize, visibleSize);
 
 % Use minFunc to minimize the function
-addpath minFunc/
 
 clear('options');
-options.Method = 'lbfgs'; 
+options.Method = 'lbfgs';
 options.maxIter = 400;
 options.display = 'on';
 
@@ -131,9 +131,9 @@ options.display = 'on';
                                    beta, patches), ...
                               theta, options);
 
-% Save the learned features and the preprocessing matrices for use in 
+% Save the learned features and the preprocessing matrices for use in
 % the later exercise on convolution and pooling
-fprintf('Saving learned features and preprocessing matrices...\n');                          
+fprintf('Saving learned features and preprocessing matrices...\n');
 save('STL10Features.mat', 'optTheta', 'ZCAWhite', 'meanPatch');
 fprintf('Saved\n');
 

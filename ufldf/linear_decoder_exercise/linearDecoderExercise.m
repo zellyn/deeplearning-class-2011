@@ -30,46 +30,46 @@ beta = 5;              % weight of sparsity penalty term
 
 epsilon = 0.1;	       % epsilon for ZCA whitening
 
-%%======================================================================
-%% STEP 1: Create and modify sparseAutoencoderLinearCost.m to use a linear decoder,
-%          and check gradients
-%  You should copy sparseAutoencoderCost.m from your earlier exercise
-%  and rename it to sparseAutoencoderLinearCost.m.
-%  Then you need to rename the function from sparseAutoencoderCost to
-%  sparseAutoencoderLinearCost, and modify it so that the sparse autoencoder
-%  uses a linear decoder instead. Once that is done, you should check
-% your gradients to verify that they are correct.
-
-% NOTE: Modify sparseAutoencoderCost first!
-
-% To speed up gradient checking, we will use a reduced network and some
-% dummy patches
-hiddenSize = 5;
-visibleSize = 8;
-patches = rand([8 10]);
-theta = initializeParameters(hiddenSize, visibleSize);
-
-[cost, grad] = sparseAutoencoderLinearCost(theta, visibleSize, hiddenSize, ...
-                                           lambda, sparsityParam, beta, ...
-                                           patches);
-
-% Check gradients
-numGrad = computeNumericalGradient( @(x) sparseAutoencoderLinearCost(x, visibleSize, hiddenSize, ...
-                                                  lambda, sparsityParam, beta, ...
-                                                  patches), theta);
-
-% Use this to visually compare the gradients side by side
-disp([numGrad grad]);
-
-diff = norm(numGrad-grad)/norm(numGrad+grad);
-% Should be small. In our implementation, these values are usually less than 1e-9.
-disp(diff);
-
-assert(diff < 1e-9, 'Difference too large. Check your gradient computation again');
-
-% NOTE: Once your gradients check out, you should run step 0 again to
-%       reinitialize the parameters
-%}
+% %%======================================================================
+% %% STEP 1: Create and modify sparseAutoencoderLinearCost.m to use a linear decoder,
+% %          and check gradients
+% %  You should copy sparseAutoencoderCost.m from your earlier exercise
+% %  and rename it to sparseAutoencoderLinearCost.m.
+% %  Then you need to rename the function from sparseAutoencoderCost to
+% %  sparseAutoencoderLinearCost, and modify it so that the sparse autoencoder
+% %  uses a linear decoder instead. Once that is done, you should check
+% % your gradients to verify that they are correct.
+%
+% % NOTE: Modify sparseAutoencoderCost first!
+%
+% % To speed up gradient checking, we will use a reduced network and some
+% % dummy patches
+% hiddenSize = 5;
+% visibleSize = 8;
+% patches = rand([8 10]);
+% theta = initializeParameters(hiddenSize, visibleSize);
+%
+% [cost, grad] = sparseAutoencoderLinearCost(theta, visibleSize, hiddenSize, ...
+%                                            lambda, sparsityParam, beta, ...
+%                                            patches);
+%
+% % Check gradients
+% numGrad = computeNumericalGradient( @(x) sparseAutoencoderLinearCost(x, visibleSize, hiddenSize, ...
+%                                                   lambda, sparsityParam, beta, ...
+%                                                   patches), theta);
+%
+% % Use this to visually compare the gradients side by side
+% disp([numGrad grad]);
+%
+% diff = norm(numGrad-grad)/norm(numGrad+grad);
+% % Should be small. In our implementation, these values are usually less than 1e-9.
+% disp(diff);
+%
+% assert(diff < 1e-9, 'Difference too large. Check your gradient computation again');
+%
+% % NOTE: Once your gradients check out, you should run step 0 again to
+% %       reinitialize the parameters
+% %}
 
 %%======================================================================
 %% STEP 2: Learn features on small patches

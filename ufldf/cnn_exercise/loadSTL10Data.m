@@ -1,13 +1,13 @@
 function [numExamples, images, labels] = loadSTL10Data(setType, maxExamples)
 %loadSTL10Data Load data (images and labels) for STL10 dataset
 % Parameters:
-%  setType - one of 'train', 'trainSmall', 'trainSmall64', 
+%  setType - one of 'train', 'trainSmall', 'trainSmall64',
 %            'test','testSmall', 'testSmall64'
 %  (optional) maxExamples - truncate the examples to at most this number
-% 
+%
 % Returns:
 %   numExamples - number of examples loaded
-%   images - images, such that images(r, c, channel, image number) is the 
+%   images - images, such that images(r, c, channel, image number) is the
 %            intensity of the (r, c) pixel of the given channel for the
 %            given image
 %   labels - labels (ranges from 1 - 10 for the STL10 dataset)
@@ -25,13 +25,13 @@ assert(isequal(setType, 'train') | isequal(setType, 'trainSmall') | isequal(setT
        'setType should be one of "train", "trainSmall", "trainSmall64", "test", "testSmall" or "testSmall64" ');
 
 imageChannels = 3;
-if isequal(setType(end-1:end), '64')   
+if isequal(setType(end-1:end), '64')
     imageDim = 64;
 else
     imageDim = 96;
 end
 
-filename = sprintf('stl10/%s.mat', setType);
+filename = sprintf('../data/stl10_matlab/%s.mat', setType);
 images = load(filename, 'X');
 images = double(images.X);
 labels = load(filename, 'y');

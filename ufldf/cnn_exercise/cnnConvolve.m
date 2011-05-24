@@ -21,7 +21,6 @@ imageChannels = size(images, 3);
 
 convolvedFeatures = zeros(numFeatures, numImages, imageDim - patchDim + 1, imageDim - patchDim + 1);
 
-% -------------------- YOUR CODE HERE --------------------
 % Instructions:
 %   Convolve every feature with every large image here to produce the 
 %   numFeatures x numImages x (imageDim - patchDim + 1) x (imageDim - patchDim + 1) 
@@ -35,7 +34,67 @@ convolvedFeatures = zeros(numFeatures, numImages, imageDim - patchDim + 1, image
 %   Convolving with 5000 images should take around an hour
 %   (So to save time when testing, you should convolve with less images, as
 %   described earlier)
+
 % -------------------- YOUR CODE HERE --------------------
+% Precompute the matrices that will be used during the convolution. Recall
+% that you need to take into account the whitening and mean subtraction
+% steps
+
+
+
+
+
+
+% --------------------------------------------------------
+
+convolvedFeatures = zeros(numFeatures, numImages, imageDim - patchDim + 1, imageDim - patchDim + 1);
+for imageNum = 1:numImages
+  for featureNum = 1:numFeatures
+
+    % convolution of image with feature matrix for each channel
+    convolvedImage = zeros(imageDim - patchDim + 1, imageDim - patchDim + 1);
+    for channel = 1:3
+
+      % Obtain the feature (patchDim x patchDim) needed during the convolution
+      % ---- YOUR CODE HERE ----
+
+      
+      
+      
+      
+      % ------------------------
+
+      % Flip the feature matrix because of the definition of convolution, as explained later
+      feature = flipud(fliplr(squeeze(feature)));
+      
+      % Obtain the image
+      im = squeeze(images(:, :, channel, imageNum));
+
+      % Convolve "feature" with "im", adding the result to convolvedImage
+      % be sure to do a 'valid' convolution
+      % ---- YOUR CODE HERE ----
+
+      
+      
+      
+      % ------------------------
+
+    end
+    
+    % Subtract the bias unit (correcting for the mean subtraction as well)
+    % Then, apply the sigmoid function to get the hidden activation
+    % ---- YOUR CODE HERE ----
+
+    
+    
+    
+    % ------------------------
+    
+    % The convolved feature is the sum of the convolved values for all channels
+    convolvedFeatures(featureNum, imageNum, :, :) = convolvedImage;
+  end
+end
+
 
 end
 

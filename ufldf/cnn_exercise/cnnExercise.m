@@ -130,6 +130,7 @@ if ~isequal(pooledFeatures, expectedMatrix)
     disp(expectedMatrix);
     disp('Got');
     disp(pooledFeatures);
+    error('Pooling incorrect');
 else
     disp('Congratulations! Your pooling code passed the test.');
 end

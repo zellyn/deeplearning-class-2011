@@ -41,8 +41,6 @@ poolDim = 16;          % dimension of pooling region
 % the optimal parameters:
 
 load '../linear_decoder_exercise/STL10Features.mat'
-ZCAWhite = eye(size(ZCAWhite, 1));  % TODO(zellyn): remove this
-meanPatch = zeros(size(meanPatch));
 
 % --------------------------------------------------------------------
 
@@ -50,7 +48,7 @@ meanPatch = zeros(size(meanPatch));
 W = reshape(optTheta(1:visibleSize * hiddenSize), hiddenSize, visibleSize);
 b = optTheta(2*hiddenSize*visibleSize+1:2*hiddenSize*visibleSize+hiddenSize);
 
-displayColorNetwork( (W*ZCAWhite)');
+% displayColorNetwork( (W*ZCAWhite)');
 
 %%======================================================================
 %% STEP 2: Implement and test convolution and pooling
@@ -78,7 +76,7 @@ convolvedFeatures = cnnConvolve(patchDim, hiddenSize, convImages, W, b, ZCAWhite
 %  provided some code to compare the results of your convolution with
 %  activations from the sparse autoencoder
 
-rand("seed", 3);
+rand('seed', 3);
 
 % For 1000 random points
 for i = 1:1000
@@ -91,8 +89,6 @@ for i = 1:1000
     patch = patch(:);
     patch = patch - meanPatch;
     patch = ZCAWhite * patch;
-
-    W(featureNum, :) * patch
 
     features = feedForwardAutoencoder(optTheta, hiddenSize, visibleSize, patch);
 

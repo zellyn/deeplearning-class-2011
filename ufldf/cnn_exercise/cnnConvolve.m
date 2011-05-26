@@ -73,24 +73,13 @@ for imageNum = 1:numImages
 
     % convolution of image with feature matrix for each channel
     convolvedImage = zeros(imageDim - patchDim + 1, imageDim - patchDim + 1);
+    sumfp = 0;
     for channel = 1:imageChannels
 
       % Obtain the feature (patchDim x patchDim) needed during the convolution
       % ---- YOUR CODE HERE ----
       offset = patchSize * (channel-1);
-      feature = WT(featureNum, offset+1:offset+patchSize);
-
-      if (featureNum == 26) && (imageNum == 2)
-        patch = images(13:13 + patchDim - 1, 53:53 + patchDim - 1, channel, imageNum);
-        patch = patch(:);
-
-        % size(feature)
-        % size(patch)
-        % sum(feature)
-        feature * patch
-      end
-
-      feature = reshape(feature, patchDim, patchDim);
+      feature = reshape(WT(featureNum, offset+1:offset+patchSize), patchDim, patchDim);
 
       % ------------------------
 
@@ -99,16 +88,12 @@ for imageNum = 1:numImages
 
       % Obtain the image
       im = squeeze(images(:, :, channel, imageNum));
-      im = flipud(fliplr(im));
 
       % Convolve "feature" with "im", adding the result to convolvedImage
       % be sure to do a 'valid' convolution
       % ---- YOUR CODE HERE ----
 
       convolved = conv2(im, feature, 'valid');
-      if (featureNum == 26) && (imageNum == 2)
-        convolved(13, 53)
-      end
       convolvedImage = convolvedImage + convolved;
 
       % ------------------------

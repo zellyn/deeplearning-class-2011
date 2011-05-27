@@ -26,7 +26,7 @@ hiddenSize = 400;           % number of hidden units
 
 epsilon = 0.1;	       % epsilon for ZCA whitening
 
-poolDim = 16;          % dimension of pooling region
+poolDim = 19;          % dimension of pooling region
 
 %%======================================================================
 %% STEP 1: Train a sparse autoencoder (with a linear decoder) to learn

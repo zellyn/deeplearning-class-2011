@@ -7,9 +7,9 @@
 # My implementation of the [Stacked autoencoder deep network exercise](http://ufldl.stanford.edu/wiki/index.php/Exercise:_Implement_deep_networks_for_digit_classification)
 # for the Deep Learning class.
 
-DEBUG = True
-DISPLAY = False
-maxfun = 10
+DEBUG = False
+DISPLAY = True
+maxfun = 400
 
 import time
 import sys
@@ -74,7 +74,7 @@ sae1_theta = autoencoder.initialize_parameters(hidden_size_l1, input_size)
 fn = lambda theta: autoencoder.sparse_autoencoder_loss(
   theta, input_size, hidden_size_l1, lamb, sparsity_param, beta, train_data)
 sae1_opt_theta, loss, d = (
-  scipy.optimize.fmin_l_bfgs_b(fn, sae1_theta, maxfun=maxfun, iprint=1, m=20))
+  scipy.optimize.fmin_l_bfgs_b(fn, sae1_theta, maxfun=maxfun, iprint=1))
 
 if DISPLAY:
   W1, W2, b1, b2 = autoencoder.unflatten(sae1_opt_theta, input_size, hidden_size_l1)
@@ -91,7 +91,7 @@ sae2_theta = autoencoder.initialize_parameters(hidden_size_l2, hidden_size_l1)
 fn = lambda theta: autoencoder.sparse_autoencoder_loss(
   theta, hidden_size_l1, hidden_size_l2, lamb, sparsity_param, beta, sae1_features)
 sae2_opt_theta, loss, d = (
-  scipy.optimize.fmin_l_bfgs_b(fn, sae2_theta, maxfun=maxfun, iprint=1, m=20))
+  scipy.optimize.fmin_l_bfgs_b(fn, sae2_theta, maxfun=maxfun, iprint=1))
 
 if DISPLAY:
   W11, W21, b11, b21 = autoencoder.unflatten(sae1_opt_theta, input_size, hidden_size_l1)
@@ -109,7 +109,7 @@ sae_softmax_theta = 0.005 * np.random.randn(hidden_size_l2 * num_classes, 1)
 # dimension `hidden_size_l2` corresponding to the hidden layer size of
 # the 2nd layer.
 softmax_model = softmax.train(hidden_size_l2, num_classes, 1e-4, sae2_features, train_labels, maxfun=maxfun)
-sae_softmax_opt_theta = softmax_model['opt_theta'].reshape([1, -1], order='F')
+sae_softmax_opt_theta = softmax_model['opt_theta'].ravel('F')
 
 # === Step 5: Finetune softmax model ===
 #
@@ -125,7 +125,7 @@ stack[1].w = W12
 stack[1].b = b12
 
 stack_params, netconfig = stackedae.stack2params(stack)
-stackedae_theta = np.hstack([sae_softmax_opt_theta, stack_params])
+stackedae_theta = np.append(sae_softmax_opt_theta, stack_params).ravel('F')
 
 # Train the deep network, hidden size here refers to the dimension of
 # the input to the classifier, which corresponds to `hidden_size_l2`.
@@ -133,7 +133,7 @@ stackedae_theta = np.hstack([sae_softmax_opt_theta, stack_params])
 fn = lambda theta: stackedae.cost(
   theta, input_size, hidden_size_l2, num_classes, netconfig, lamb, train_data, train_labels)
 stackedae_opt_theta, loss, d = (
-  scipy.optimize.fmin_l_bfgs_b(fn, stackedae_theta, maxfun=maxfun, iprint=1, m=20))
+  scipy.optimize.fmin_l_bfgs_b(fn, stackedae_theta, maxfun=maxfun, iprint=1))
 
 if DISPLAY:
   opt_stack = stackedae.params2stack(stackedae_opt_theta[hidden_size_l2*num_classes:], netconfig)

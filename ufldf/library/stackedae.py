@@ -33,7 +33,7 @@ def stack2params(stack):
       params = np.hstack([params, entry.w.reshape([1, -1], order='F'), entry.b.reshape([1, -1], order='F')])
       netconfig.layersizes.append(entry.w.shape[0])
 
-  return params, netconfig
+  return params.ravel('F'), netconfig
 
 # Convert a flattened parameter vector into a nice "stack" structure
 # for us to work with. This is seful when building multilayer
@@ -51,7 +51,7 @@ def params2stack(params, netconfig):
   cur_pos = 0
 
   for d in xrange(depth):
-    entry = Empty()
+    entry = util.Empty()
 
     # Extract weights
     layersize = netconfig.layersizes[d]
@@ -87,9 +87,8 @@ def cost(theta, input_size, hidden_size, num_classes, netconfig, lamb, data, lab
   softmax_theta = theta[:hidden_size * num_classes].reshape([num_classes, hidden_size], order='F')
 
   # Extract out the "stack"
-  stack = params2stack(theta[hiddenSize * numClasses:], netconfig)
-
-  stack_grad = []
+  stack = params2stack(theta[hidden_size * num_classes:], netconfig)
+  depth = len(stack)
   num_cases = data.shape[1]
   ground_truth = np.zeros([num_classes, num_cases])
   ground_truth[labels.ravel(), np.arange(num_cases)] = 1
@@ -109,12 +108,11 @@ def cost(theta, input_size, hidden_size, num_classes, netconfig, lamb, data, lab
   # layer in the stack, storing the gradients in `stack_grad[d].w` and
   # `stack_grad[d].b`.  Note that the size of the matrices in stackgrad
   # should match exactly that of the size of the matrices in stack.
-  depth = len(stack)
   z = [0]
   a = [data]
 
   for layer in xrange(depth):
-    z.append(stack[later].w.dot(a[layer]) + stack[layer].b)
+    z.append(stack[layer].w.dot(a[layer]) + stack[layer].b)
     a.append(autoencoder.sigmoid(z[layer+1]))
 
   M = softmax_theta.dot(a[depth])
@@ -124,21 +122,24 @@ def cost(theta, input_size, hidden_size, num_classes, netconfig, lamb, data, lab
   gt_vec = ground_truth.reshape([1, -1], order='F')
   p_vec = p.reshape([-1, 1], order='F')
   cost = (-1.0/num_cases * gt_vec.dot(np.log(p_vec)) + lamb/2 * (softmax_theta**2).sum())
-  theta_grad = -1.0/num_cases * (ground_truth - p).dot(data.T) + lamb * softmax_theta
+  softmax_theta_grad = -1.0/num_cases * (ground_truth - p).dot(a[depth].T) + lamb * softmax_theta
 
-  d = [0 for x in xrange(depth+1)]
+  d = [0 for _ in xrange(depth+1)]
 
-  d[depth] = -(softmax_theta.T.dot(groundTruth - p)) * a[depth] * (1-a[depth])
+  d[depth] = -(softmax_theta.T.dot(ground_truth - p)) * a[depth] * (1-a[depth])
 
   for layer in range(depth-1, 0, -1):
     d[layer] = stack[layer].w.T.dot(d[layer+1]) * a[layer] * (1-a[layer])
 
+  stack_grad = [util.Empty() for _ in xrange(depth)]
   for layer in range(depth-1, -1, -1):
     stack_grad[layer].w = (1.0/num_cases) * d[layer+1].dot(a[layer].T)
     stack_grad[layer].b = (1.0/num_cases) * np.sum(d[layer+1], 1)[:, np.newaxis]
 
-  grad = np.hstack([softmax_theta_grad.reshape([1, -1], order='F'), stack2params(stack_grad)[0]])
+  grad = np.append(softmax_theta_grad.ravel('F'), stack2params(stack_grad)[0])
 
+  assert (grad.shape==theta.shape)
+  assert grad.flags['F_CONTIGUOUS']
   return cost, grad
 
 # Take a trained theta and a test data set, and return the predicted
@@ -146,8 +147,8 @@ def cost(theta, input_size, hidden_size, num_classes, netconfig, lamb, data, lab
 #
 # - `theta` - trained weights from the autoencoder
 # - `visibleSize` - the number of input units
-# - `hiddenSize` - the number of hidden units *at the 2nd layer*
-# - `numClasses` - the number of categories
+# - `hidden_size` - the number of hidden units *at the 2nd layer*
+# - `num_classes` - the number of categories
 # - `data` - matrix containing the training data as columns.  So,
 #   `data[:,i]` is the i-th training example.
 #
@@ -158,19 +159,14 @@ def predict(theta, input_size, hidden_size, num_classes, netconfig, data):
   softmax_theta = theta[:hidden_size * num_classes].reshape([num_classes, hidden_size], order='F')
 
   # Extract out the "stack"
-  stack = params2stack(theta[hiddenSize * numClasses:], netconfig)
-
-  stack_grad = []
-  num_cases = data.shape[1]
-  ground_truth = np.zeros([num_classes, num_cases])
-  ground_truth[labels.ravel(), np.arange(num_cases)] = 1
+  stack = params2stack(theta[hidden_size * num_classes:], netconfig)
 
   depth = len(stack)
   z = [0]
   a = [data]
 
   for layer in xrange(depth):
-    z.append(stack[later].w.dot(a[layer]) + stack[layer].b)
+    z.append(stack[layer].w.dot(a[layer]) + stack[layer].b)
     a.append(autoencoder.sigmoid(z[layer+1]))
 
   return softmax_theta.dot(a[depth]).argmax(0)

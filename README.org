@@ -24,3 +24,9 @@ Why? Is it *almost* convex? Are the local optima all of a similar
 quality? Are any of the variations (squared error / squared error +
 weight decay / squared error + weight decay + sparsity constraints)
 convex?
+* Tasks
+** Python
+*** TODO Get [[file:ufldf/stackedae_exercise/stackedae_exercise.py][stackedae_exercise.py]] to work.
+*** TODO Implement [[file:ufldf/linear_decoder_exercise][linear_decoder_exercise]].
+*** TODO Implement [[file:ufldf/cnn_exercise][cnn_exercise]].
+

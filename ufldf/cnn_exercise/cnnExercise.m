@@ -76,8 +76,6 @@ convolvedFeatures = cnnConvolve(patchDim, hiddenSize, convImages, W, b, ZCAWhite
 %  provided some code to compare the results of your convolution with
 %  activations from the sparse autoencoder
 
-rand('seed', 3);
-
 % For 1000 random points
 for i = 1:1000
     featureNum = randi([1, hiddenSize]);
@@ -173,6 +171,7 @@ for convPart = 1:(hiddenSize / stepSize)
     fprintf('Convolving and pooling train images\n');
     convolvedFeaturesThis = cnnConvolve(patchDim, stepSize, ...
         trainImages, Wt, bt, ZCAWhite, meanPatch);
+    toc();
     pooledFeaturesThis = cnnPool(poolDim, convolvedFeaturesThis);
     pooledFeaturesTrain(featureStart:featureEnd, :, :, :) = pooledFeaturesThis;
     toc();
@@ -181,6 +180,7 @@ for convPart = 1:(hiddenSize / stepSize)
     fprintf('Convolving and pooling test images\n');
     convolvedFeaturesThis = cnnConvolve(patchDim, stepSize, ...
         testImages, Wt, bt, ZCAWhite, meanPatch);
+    toc();
     pooledFeaturesThis = cnnPool(poolDim, convolvedFeaturesThis);
     pooledFeaturesTest(featureStart:featureEnd, :, :, :) = pooledFeaturesThis;
     toc();

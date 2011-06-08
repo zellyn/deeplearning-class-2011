@@ -1,3 +1,4 @@
 ufldf/data/stl10_matlab/*mat
 *.pyc
 *.dat
+ufldf/cnn_exercise/cnnPooledFeatures.mat

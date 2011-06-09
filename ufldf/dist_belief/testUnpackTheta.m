@@ -1,4 +1,4 @@
-% Test sizes
+function [] = testUnpackTheta()
 
 visibleDim = 5;  % width/height of input
 visibleSize = visibleDim^2;
@@ -65,3 +65,5 @@ assert (W2 == tW2);
 assert (b2 == tb2);
 assert (W3 == tW3);
 assert (b3 == tb3);
+
+end

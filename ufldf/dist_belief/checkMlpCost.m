@@ -65,3 +65,5 @@ diff = norm(numgrad-grad)/norm(numgrad+grad);
 disp(diff); % Should be small. In our implementation, these values are
             % usually less than 1e-9.
 assert (diff < 1e-9);
+
+end

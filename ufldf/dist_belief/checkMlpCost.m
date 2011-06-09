@@ -56,14 +56,14 @@ numgrad = computeNumericalGradient( @(x) mlpCost(x, visibleSize, ...
                                    theta);
 
 % Use this to visually compare the gradients side by side
-% disp([numgrad grad (numgrad-grad));
+% disp([numgrad grad (numgrad-grad)]);
 
 % Compare numerically computed gradients with the ones obtained from backpropagation
-disp('Norm between numerical and analytical gradient (should be less than 1e-9)');
+% disp('Norm between numerical and analytical gradient (should be less than 1e-9)');
 diff = norm(numgrad-grad)/norm(numgrad+grad);
 
-disp(diff); % Should be small. In our implementation, these values are
-            % usually less than 1e-9.
+% disp(diff); % Should be small. In our implementation, these values are
+              % usually less than 1e-9.
 assert (diff < 1e-9);
 
 end

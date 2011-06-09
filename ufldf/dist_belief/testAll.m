@@ -8,6 +8,10 @@ function [] = testAll()
   testUnpackTheta();
   disp('Done.');
 
+  disp('Checking multiplyStripes...');
+  testMultiplyStripes();
+  disp('Done.');
+
   disp('Checking cost func mlpCost...');
   checkMlpCost();
   disp('Done.');

@@ -1,0 +1,9 @@
+- [[file:starter][starter]] - sparse autoencoder, vectorization
+- [[file:pca_2d][pca_2d]] - pca part 1
+- [[file:pca_exercise][pca_exercise]] - pca part 2
+- [[file:softmax_exercise][softmax_exercise]] - softmax regression
+- [[file:stl_exercise][stl_exercise]] - self-taught learning
+- [[file:stackedae_exercise][stackedae_exercise]] - deep networks - digit classification
+- [[file:linear_decoder_exercise][linear_decoder_exercise]] - linear decoders
+- [[file:cnn_exercise][cnn_exercise]] - convolution and pooling
+- [[file:dist_belief][dist_belief]] - matlab prework for dist_belief exercise

@@ -16,6 +16,10 @@ function [] = testAll()
   testBackMultiplyStripes();
   disp('Done.');
 
+  disp('Checking indexedWeightSubset...');
+  testIndexedWeightSubset();
+  disp('Done.');
+
   disp('Checking cost func mlpCost...');
   checkMlpCost();
   disp('Done.');

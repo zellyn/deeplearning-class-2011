@@ -1,4 +1,7 @@
-function indices = buildIndices(layerSize, inputSize, layerDim, inputDim, viewDim, viewStep)
+function indices = buildIndices(inputDim, layerDim, viewDim, viewStep)
+  inputSize = inputDim^2;
+  layerSize = layerDim^2;
+
   assert (((layerDim-1) * viewStep + viewDim) == inputDim);
   mask = zeros(layerSize, inputSize);
   indices = zeros(viewDim^2, layerSize);

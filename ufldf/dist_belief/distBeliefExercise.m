@@ -40,8 +40,8 @@ assert (((hiddenDimL2-1) * hiddenViewStepL2 + hiddenViewDimL2) == hiddenDimL1);
 [W2, b2] = initializeOneLayerParams(hiddenSizeL2, hiddenViewSizeL2);
 [W3, b3] = initializeOneLayerParams(1, hiddenSizeL2);
 
-W1Indices = buildIndices(hiddenSizeL1, visibleSize, hiddenDimL1, visibleDim, hiddenViewDimL1, hiddenViewStepL1);
-W2Indices = buildIndices(hiddenSizeL2, hiddenSizeL1, hiddenDimL2, hiddenDimL1, hiddenViewDimL2, hiddenViewStepL2);
+W1Indices = buildIndices(visibleDim, hiddenDimL1, hiddenViewDimL1, hiddenViewStepL1);
+W2Indices = buildIndices(hiddenDimL1, hiddenDimL2, hiddenViewDimL2, hiddenViewStepL2);
 
 assert (size(W1Indices) == [hiddenViewSizeL1, hiddenSizeL1]);
 assert (size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]);

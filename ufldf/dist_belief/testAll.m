@@ -12,6 +12,10 @@ function [] = testAll()
   testMultiplyStripes();
   disp('Done.');
 
+  disp('Checking backMultiplyStripes...');
+  testBackMultiplyStripes();
+  disp('Done.');
+
   disp('Checking cost func mlpCost...');
   checkMlpCost();
   disp('Done.');

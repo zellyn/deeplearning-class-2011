@@ -5,11 +5,16 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
-% 3e-4
-% 1e-3:
-% 3e-3: 75.438%
-% 1e-2: 50% (doesn't work)
-lambda = 1e-3;
+% 0: (82.188 - 164/187), (81.188 - 273/351)
+% 1e-4: (82.375 - 1000)
+% 3e-4: (82.938 - 1000), (83.062 - 1000), (83.000 with 1591/1767)
+% 1e-3: (78.188 - 400), (78.375 - 481/525)
+% 3e-3: (75.438)
+% 1e-2: 50%
+lambda = 3e-4;
+lambda = 0;
+maxIter = 1000;
+maxFunEvals = 1000;
 
 % X: 5000 x 27648
 % y: 5000 x 1
@@ -70,7 +75,8 @@ assert(all(size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]));
 theta = [W1(:);b1(:);W2(:);b2(:);W3(:);b3(:)];
 
 options.Method = 'lbfgs';
-options.maxIter = 400;
+options.maxIter = maxIter;
+options.maxFunEvals = maxFunEvals;
 options.display = 'on';
 
 [optTheta, loss] = minFunc( @(x) mlpCost(x, visibleSize, ...
@@ -114,3 +120,4 @@ labelsTest_dc = (y_dc == labelDog)';    % Dog = 1, Cat = 0
                     Xtest_hp);
 acc = mean(labelsTest_hp(:) == pred(:));
 fprintf('Test Accuracy: %0.3f%%\n', acc * 100);
+fprintf('(lambda = %0.0e\n)', lambda);

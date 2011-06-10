@@ -5,7 +5,7 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
-lambda = 3e-3;
+lambda = 1e-2;
 
 % X: 5000 x 27648
 % y: 5000 x 1
@@ -59,8 +59,8 @@ assert (((hiddenDimL2-1) * hiddenViewStepL2 + hiddenViewDimL2) == hiddenDimL1);
 W1Indices = buildIndices(visibleDim, hiddenDimL1, hiddenViewDimL1, hiddenViewStepL1);
 W2Indices = buildIndices(hiddenDimL1, hiddenDimL2, hiddenViewDimL2, hiddenViewStepL2);
 
-assert (size(W1Indices) == [hiddenViewSizeL1, hiddenSizeL1]);
-assert (size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]);
+assert(all(size(W1Indices) == [hiddenViewSizeL1, hiddenSizeL1]));
+assert(all(size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]));
 
 theta = [W1(:);b1(:);W2(:);b2(:);W3(:);b3(:)];
 
@@ -93,10 +93,10 @@ Xtest_dc = X(mask_dc, :)';
 labelsTest_hp = (y_hp == labelHorse)';  % Horse = 1, Plane = 0
 labelsTest_dc = (y_dc == labelDog)';    % Dog = 1, Cat = 0
 
-[pred] = mlpPredict(theta, visibleSize, ...
+[pred] = mlpPredict(optTheta, visibleSize, ...
                     hiddenSizeL1, hiddenViewSizeL1, ...
                     hiddenSizeL2, hiddenViewSizeL2, ...
                     W1Indices, W2Indices, ...
                     Xtest_hp);
-acc = mean(labesTest_hp(:) == pred(:));
+acc = mean(labelsTest_dc(:) == pred(:));
 fprintf('Test Accuracy: %0.3f%%\n', acc * 100);

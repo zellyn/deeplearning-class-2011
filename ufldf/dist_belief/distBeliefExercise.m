@@ -5,6 +5,14 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
+% 3e-4
+% 1e-3:
+% 3e-3:
+% 1e-2:
+% 3e-2:
+% 1e-1;
+% 3e-1;
+% 1:
 lambda = 1e-2;
 
 % X: 5000 x 27648
@@ -19,6 +27,7 @@ labelCat = 4;
 disp('Loading training data');
 load '../data/stl10_matlab/train.mat';
 disp('Reformatting training data');
+X = double(X)/255;
 trainImages = reshape(X,5000,96,96,3);
 trainImagesBw = squeeze(mean(trainImages, 4));
 X = reshape(trainImagesBw, 5000, 96^2);
@@ -79,6 +88,7 @@ options.display = 'on';
 disp('Loading test data');
 load '../data/stl10_matlab/test.mat';
 disp('Reformatting test data');
+X = double(X)/255;
 testImages = reshape(X,8000,96,96,3);
 testImagesBw = squeeze(mean(testImages, 4));
 X = reshape(testImagesBw, 8000, 96^2);

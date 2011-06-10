@@ -7,13 +7,9 @@ addpath '../library/minFunc/'
 
 % 3e-4
 % 1e-3:
-% 3e-3:
-% 1e-2:
-% 3e-2:
-% 1e-1;
-% 3e-1;
-% 1:
-lambda = 1e-2;
+% 3e-3: 75.438%
+% 1e-2: 50% (doesn't work)
+lambda = 1e-3;
 
 % X: 5000 x 27648
 % y: 5000 x 1
@@ -84,6 +80,14 @@ options.display = 'on';
                                          lambda, Xtrain_hp, labelsTrain_hp), ...
                            theta, options);
 
+[pred] = mlpPredict(optTheta, visibleSize, ...
+                    hiddenSizeL1, hiddenViewSizeL1, ...
+                    hiddenSizeL2, hiddenViewSizeL2, ...
+                    W1Indices, W2Indices, ...
+                    Xtrain_hp);
+acc = mean(labelsTrain_hp(:) == pred(:));
+fprintf('Accuracy on input data: %0.3f%%\n', acc * 100);
+
 
 disp('Loading test data');
 load '../data/stl10_matlab/test.mat';
@@ -108,5 +112,5 @@ labelsTest_dc = (y_dc == labelDog)';    % Dog = 1, Cat = 0
                     hiddenSizeL2, hiddenViewSizeL2, ...
                     W1Indices, W2Indices, ...
                     Xtest_hp);
-acc = mean(labelsTest_dc(:) == pred(:));
+acc = mean(labelsTest_hp(:) == pred(:));
 fprintf('Test Accuracy: %0.3f%%\n', acc * 100);

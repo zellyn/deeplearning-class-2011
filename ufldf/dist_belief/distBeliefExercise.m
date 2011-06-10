@@ -5,18 +5,34 @@
 addpath '../library/'
 addpath '../library/minFunc/'
 
+lambda = 3e-3;
+
 % X: 5000 x 27648
 % y: 5000 x 1
 % class_names: 1 x 10
-% size(fold_indices): 1 x 10
-% size(fold_indices{1}): 1000 x 1
 
+labelHorse = 7;
+labelPlane = 1;
+labelDog = 6;
+labelCat = 4;
 
-% load '../data/stl10_matlab/train.mat';
-% trainImages = reshape(X,5000,96,96,3);
-% trainImagesBw = squeeze(mean(trainImages, 4));
+disp('Loading training data');
+load '../data/stl10_matlab/train.mat';
+disp('Reformatting training data');
+trainImages = reshape(X,5000,96,96,3);
+trainImagesBw = squeeze(mean(trainImages, 4));
+X = reshape(trainImagesBw, 5000, 96^2);
 
-% TODO(zellyn): pull out just horses/planes or etc.
+mask_hp = (y == labelHorse) | (y == labelPlane);
+mask_dc = (y == labelDog) | (y == labelCat);
+
+y_hp = y(mask_hp);
+Xtrain_hp = X(mask_hp, :)';
+y_dc = y(mask_dc);
+Xtrain_dc = X(mask_dc, :)';
+labelsTrain_hp = (y_hp == labelHorse)';  % Horse = 1, Plane = 0
+labelsTrain_dc = (y_dc == labelDog)';    % Dog = 1, Cat = 0
+
 
 visibleDim = 96;  % width/height of input
 visibleSize = visibleDim^2;
@@ -45,3 +61,42 @@ W2Indices = buildIndices(hiddenDimL1, hiddenDimL2, hiddenViewDimL2, hiddenViewSt
 
 assert (size(W1Indices) == [hiddenViewSizeL1, hiddenSizeL1]);
 assert (size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]);
+
+theta = [W1(:);b1(:);W2(:);b2(:);W3(:);b3(:)];
+
+options.Method = 'lbfgs';
+options.maxIter = 400;
+options.display = 'on';
+
+[optTheta, loss] = minFunc( @(x) mlpCost(x, visibleSize, ...
+                                         hiddenSizeL1, hiddenViewSizeL1, ...
+                                         hiddenSizeL2, hiddenViewSizeL2, ...
+                                         W1Indices, W2Indices, ...
+                                         lambda, Xtrain_hp, labelsTrain_hp), ...
+                           theta, options);
+
+
+disp('Loading test data');
+load '../data/stl10_matlab/test.mat';
+disp('Reformatting test data');
+testImages = reshape(X,8000,96,96,3);
+testImagesBw = squeeze(mean(testImages, 4));
+X = reshape(testImagesBw, 8000, 96^2);
+
+mask_hp = (y == labelHorse) | (y == labelPlane);
+mask_dc = (y == labelDog) | (y == labelCat);
+
+y_hp = y(mask_hp);
+Xtest_hp = X(mask_hp, :)';
+y_dc = y(mask_dc);
+Xtest_dc = X(mask_dc, :)';
+labelsTest_hp = (y_hp == labelHorse)';  % Horse = 1, Plane = 0
+labelsTest_dc = (y_dc == labelDog)';    % Dog = 1, Cat = 0
+
+[pred] = mlpPredict(theta, visibleSize, ...
+                    hiddenSizeL1, hiddenViewSizeL1, ...
+                    hiddenSizeL2, hiddenViewSizeL2, ...
+                    W1Indices, W2Indices, ...
+                    Xtest_hp);
+acc = mean(labesTest_hp(:) == pred(:));
+fprintf('Test Accuracy: %0.3f%%\n', acc * 100);

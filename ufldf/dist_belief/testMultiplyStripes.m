@@ -25,6 +25,6 @@ function [] = testMultiplyStripes()
               ];
   actual = multiplyStripes(W, b, stripes, data);
 
-  assert(size(expected) == size(actual));
-  assert(expected == actual);
+  assert(all(size(expected) == size(actual)));
+  assert(all(expected(:) == actual(:)));
 end

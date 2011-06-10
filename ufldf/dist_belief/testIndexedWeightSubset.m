@@ -19,6 +19,6 @@ function [] = testIndexedWeightSubset()
 
   actual = indexedWeightSubset(full, stripes);
 
-  assert(size(expected) == size(actual));
-  assert(expected == actual);
+  assert(all(size(expected) == size(actual)));
+  assert(all(expected(:) == actual(:)));
 end

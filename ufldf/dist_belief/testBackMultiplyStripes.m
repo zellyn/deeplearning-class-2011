@@ -59,6 +59,6 @@ function [] = testBackMultiplyStripes()
               ];
   actual = backMultiplyStripes(W, stripes, deltas);
 
-  assert(size(expected) == size(actual));
-  assert(expected == actual);
+  assert(all(size(expected) == size(actual)));
+  assert(all(expected(:) == actual(:)));
 end

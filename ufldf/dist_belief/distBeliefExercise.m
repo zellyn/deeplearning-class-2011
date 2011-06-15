@@ -12,9 +12,18 @@ addpath '../library/minFunc/'
 % 3e-3: (75.438)
 % 1e-2: 50%
 lambda = 3e-4;
-lambda = 0;
-maxIter = 1000;
 maxFunEvals = 1000;
+maxIter = 10000;
+minGrad = 1e-6;
+
+% 10: explodes
+% 3: explodes
+% 1: alright (plummet, then slope)
+alpha = 2;
+alphaGrow = 1.01;
+alphaShrink = 0.5;
+
+USE_MINFUNC = false;
 
 % X: 5000 x 27648
 % y: 5000 x 1
@@ -74,23 +83,58 @@ assert(all(size(W2Indices) == [hiddenViewSizeL2, hiddenSizeL2]));
 
 theta = [W1(:);b1(:);W2(:);b2(:);W3(:);b3(:)];
 
-options.Method = 'lbfgs';
-options.maxIter = maxIter;
-options.maxFunEvals = maxFunEvals;
-options.display = 'on';
-
-[optTheta, loss] = minFunc( @(x) mlpCost(x, visibleSize, ...
-                                         hiddenSizeL1, hiddenViewSizeL1, ...
-                                         hiddenSizeL2, hiddenViewSizeL2, ...
-                                         W1Indices, W2Indices, ...
-                                         lambda, Xtrain_hp, labelsTrain_hp), ...
-                           theta, options);
+if USE_MINFUNC
+  options.Method = 'lbfgs';
+  options.maxIter = maxIter;
+  options.maxFunEvals = maxFunEvals;
+  options.display = 'on';
+  [optTheta, loss] = minFunc( @(x) mlpCost(x, visibleSize, ...
+                                           hiddenSizeL1, hiddenViewSizeL1, ...
+                                           hiddenSizeL2, hiddenViewSizeL2, ...
+                                           W1Indices, W2Indices, ...
+                                           lambda, Xtrain_hp, labelsTrain_hp), ...
+                             theta, options);
+else
+  js = zeros(1,1);
+  h = plot(js, 'YDataSource', 'js');
+  js = zeros(0,1);
+  drawnow;
+  n = 1;
+  i = 0;
+  lastCost = 1e10;
+  while ((i < maxIter) && n >= minGrad)
+    i = i + 1;
+    [cost, grad] = mlpCost(theta, visibleSize, ...
+                           hiddenSizeL1, hiddenViewSizeL1, ...
+                           hiddenSizeL2, hiddenViewSizeL2, ...
+                           W1Indices, W2Indices, ...
+                           lambda, Xtrain_hp, labelsTrain_hp);
+    if (cost > lastCost)
+      alpha = alpha * alphaShrink;
+    else
+      alpha = alpha * alphaGrow;
+    end
+    lastCost = cost;
+    n = norm(grad);
+    fprintf('%d: cost=%e  norm(grad)=%e  alpha=%e\n', i, cost, n, alpha);
+    if (i > 0)
+      js = [js; cost];
+    end
+    theta = theta - alpha * grad;
+    if (mod(i,25)==0)
+      refreshdata(h, 'caller')
+      drawnow;
+    end
+  end
+  optTheta = theta;
+end
 
 [pred] = mlpPredict(optTheta, visibleSize, ...
                     hiddenSizeL1, hiddenViewSizeL1, ...
                     hiddenSizeL2, hiddenViewSizeL2, ...
                     W1Indices, W2Indices, ...
                     Xtrain_hp);
+
 acc = mean(labelsTrain_hp(:) == pred(:));
 fprintf('Accuracy on input data: %0.3f%%\n', acc * 100);
 
